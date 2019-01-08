@@ -38,7 +38,6 @@ def save_checkpoint(model: nn.Module, optim: torch.optim.Optimizer,
 def prevent_oom(func):
     """
     A function decorator that catches CUDA out of memory exceptions, triggers forced GC, and reruns the function.
-    :return:
     """
 
     import gc

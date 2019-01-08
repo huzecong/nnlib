@@ -1,9 +1,4 @@
-.. nnlib documentation master file, created by
-   sphinx-quickstart on Sun Dec 30 22:02:57 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-nnlib.utils
+Utiliies - ``nnlib.utils``
 =================================
 
 .. automodule:: nnlib.utils
@@ -15,7 +10,7 @@ The `utils` package contains useful utilities for machine learning applications 
 Batching
 --------
 
-The :mod:`batching` module contains utility functions for convenient batch creation.
+The ``batching`` module contains utility functions for convenient batch creation.
 
 .. autofunction:: minibatches_from
 .. autofunction:: pad_sequences
@@ -27,7 +22,7 @@ The :mod:`batching` module contains utility functions for convenient batch creat
 File System
 -----------
 
-The :mod:`filesystem` module aims to provide additional functionality based on the Python 3 :mod:`pathlib` built-in package. It also defines the custom type :class:`PathType`, a union of :class:`str` and :class:`pathlib.Path`.
+The ``filesystem`` module aims to provide additional functionality based on the Python 3 ``pathlib`` built-in package. It also defines the custom type :class:`PathType`, a union of :class:`str` and :class:`pathlib.Path`.
 
 .. autofunction:: path_lca
 .. autofunction:: path_add_suffix
@@ -36,7 +31,7 @@ The :mod:`filesystem` module aims to provide additional functionality based on t
 Functional
 ----------
 
-The :mod:`functional` module introduces building blocks to writing a functional dialect of Python.
+The ``functional`` module introduces building blocks to writing a functional dialect of Python.
 
 .. autofunction:: scanl
 .. autofunction:: scanr
@@ -50,7 +45,7 @@ The :mod:`functional` module introduces building blocks to writing a functional 
 IO
 ---
 
-The :mod:`io` module provides support for advanced IO operations.
+The ``io`` module provides support for advanced IO operations.
 
 .. autofunction:: shut_up
 .. autofunction:: reverse_open
@@ -59,7 +54,7 @@ The :mod:`io` module provides support for advanced IO operations.
 Iterable
 --------
 
-The :mod:`iterable` module includes utility functions and lazy data structures for working with iterators.
+The ``iterable`` module includes utility functions and lazy data structures for working with iterators.
 
 .. autofunction:: flat_iter
 .. autoclass:: LazyList
@@ -71,7 +66,7 @@ The :mod:`iterable` module includes utility functions and lazy data structures f
 Logging
 -------
 
-The :mod:`logging` module contains a global logger that supports verbosity level control, colored output, and advanced formatting.
+The ``logging`` module contains a global logger that supports verbosity level control, colored output, and advanced formatting.
 
 .. autofunction:: timestamp
 
@@ -81,7 +76,7 @@ The :mod:`logging` module contains a global logger that supports verbosity level
 Math
 ----
 
-The :mod:`math` module provides math utilities.
+The ``math`` module provides math utilities.
 
 .. autoclass:: FNVHash
 .. autofunction:: ceil_div
@@ -96,7 +91,7 @@ The :mod:`math` module provides math utilities.
 Miscellaneous
 -------------
 
-The :mod:`misc` module contains everything that cannot be categorized into the other categories.
+The ``misc`` module contains everything that cannot be categorized into the other categories.
 
 .. autofunction:: progress
 .. autofunction:: deprecated
@@ -108,7 +103,7 @@ The :mod:`misc` module contains everything that cannot be categorized into the o
 NER
 ---
 
-The :mod:`ner` module includes utilities for the task of Named Entity Recognition.
+The ``ner`` module includes utilities for the task of Named Entity Recognition.
 
 .. autofunction:: bieso2bio
 .. autofunction:: bio2bieso
@@ -117,7 +112,7 @@ The :mod:`ner` module includes utilities for the task of Named Entity Recognitio
 String
 ------
 
-The :mod:`string` module provides methods for name manipulation and natural logging.
+The ``string`` module provides methods for name manipulation and natural logging.
 
 .. autofunction:: ordinal
 .. autofunction:: to_camelcase
@@ -128,7 +123,7 @@ The :mod:`string` module provides methods for name manipulation and natural logg
 Timing
 ------
 
-The :mod:`timing` module contains utility functions for timing code performance.
+The ``timing`` module contains utility functions for timing code performance.
 
 .. autofunction:: work_in_progress
 
@@ -143,7 +138,7 @@ The following are MATLAB-style timing functions.
 Values
 ------
 
-The :mod:`values` module provides utilities to conveniently wrap, accumulate, or record values.
+The ``values`` module provides utilities to conveniently wrap, accumulate, or record values.
 
 .. autoclass:: AnnealedValue
 	:members:
@@ -165,3 +160,12 @@ The following are :class:`Average`\ -based record keepers.
 .. autofunction:: add_record
 .. autofunction:: record_value
 .. autofunction:: summarize_values
+
+
+Black Magic
+-----------
+
+The sub-package ``black_magic`` contains stuff that's not intended to be used in everyday-Python, unless you know how it works.
+
+.. autoclass:: nnlib.utils.black_magic.DynamicValue
+.. autofunction:: nnlib.utils.black_magic.IPython_main

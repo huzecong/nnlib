@@ -34,6 +34,25 @@ class MLP(nn.Module):
     """
     Multi-layer perceptron. A convenient interface to stacked fully-connected layers. Each layer is a linear followed
     by an optional activation, with optional dropout.
+
+    Parameters `activation`, `bias`, `bias_init`, and `dropout` can be either a single value or a list of values
+    for each layer. If using a single value, then the value is specified for every layer.
+
+    :param hidden_dims: List of dimensions for each intermediate hidden representation.
+    :param activation: This parameter can take the following as arguments:
+
+        - str ``id`` (default): Indicating simple affine transform.
+        - str among ``relu``, ``sigmoid``, ``tanh``, or a function: The specified function will be used as activation
+          for all layers.
+
+        There are also special rules for `activation`:
+
+        - `activation` can take a list of length ``num_layers - 1``, in which case the final activation is identity.
+        - When single value is specified and ``num_layers`` is greater than 1, the final activation is default to
+          identity. To override this behavior, manually specify activation for each layer.
+    :param bias: Whether to include additive bias.
+    :param bias_init: If not ``None``, use a constant initialization for the bias.
+    :param dropout: If not ``None``, apply dropout **before** linear transform.
     """
 
     activation_func = {
@@ -48,24 +67,6 @@ class MLP(nn.Module):
                  activation: MaybeList[Activation] = 'id',
                  bias: MaybeList[bool] = True, bias_init: Optional[MaybeList[Optional[float]]] = None,
                  dropout: Optional[MaybeList[float]] = None):
-        """
-        Parameters `activation`, `bias`, `bias_init`, and `dropout` can be either a single value or a list of values
-        for each layer. If using a single value, then the value is specified for every layer.
-
-        :param hidden_dims: List of dimensions for each intermediate hidden representation.
-        :param activation: This parameter can take the following as arguments:
-            * str 'id' (default):
-                Indicating simple affine transform.
-            * str among ['relu', 'sigmoid', 'tanh'], or a function:
-                The specified function will be used as activation for all layers.
-            There are also special rules for `activation`:
-            * `activation` can take a list of length `num_layers - 1`, in which case the final activation is identity.
-            * When single value is specified and `num_layers` is greater than 1, the final activation is default to
-              identity. To override this behavior, manually specify activation for each layer.
-        :param bias: Whether to include additive bias.
-        :param bias_init: If not None, use a constant initialization for the bias.
-        :param dropout: If not None, apply dropout **before** linear transform.
-        """
         # validate num_layers
         if not isinstance(num_layers, int) or num_layers < 1:
             raise ValueError("`layers` should be a positive integer.")
@@ -136,6 +137,7 @@ class MLP(nn.Module):
                     nn.init.uniform_(linear.bias, -std, std)
 
     def forward(self, xs: Tensor) -> Tensor:
+        """"""
         for linear, activation, dropout in zip(self.layers, self.activations, self.dropouts):
             if dropout > 0.0:
                 xs = F.dropout(xs, dropout, self.training)

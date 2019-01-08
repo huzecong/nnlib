@@ -34,6 +34,10 @@ class Embedding(nn.Embedding):
         ...
 
     def forward(self, input):
+        """
+        :param input: A :class:`~torch.LongTensor`, or a :class:`~torch.utils.rnn.PackedSequence`.
+        :return: A :class:`~torch.Tensor`, or a :class:`~torch.utils.rnn.PackedSequence`.
+        """
         device = self.weight.device
         indices = input.data if isinstance(input, PackedSequence) else input
 
@@ -74,6 +78,16 @@ class Embedding(nn.Embedding):
     @classmethod
     def from_pretrained(cls, embed_type: str, embed_path: Path, word_vocab: Vocabulary, embed_dim: int,
                         freeze=True, sparse=False) -> 'Embedding':
+        """
+        Creates an :class:`Embedding` instance from external pretrained embeddings.
+
+        :param embed_type: Type of the embedding, can be ``word2vec`` or ``fasttext``.
+        :param embed_path: Path to the embedding file.
+        :param word_vocab: A vocabulary mapping words to indices.
+        :param embed_dim: Dimension of embeddings.
+        :param freeze: If ``True``, embeddings are fixed during training.
+        :param sparse: If ``True``, sparse embeddings are used. See PyTorch documentation for details.
+        """
         embed_path_str = str(embed_path.resolve())
         if embed_type == 'word2vec':
             from gensim.models.word2vec import Word2VecKeyedVectors

@@ -51,6 +51,7 @@ class Vocabulary(defaultdict, Generic[K, V]):
         super().__setitem__(key, value)
 
     def update(self, m: Union[K, Sequence[K]], **kwargs):
+        """"""
         if isinstance(m, dict):
             super().update(m)
         elif isinstance(m, list):
@@ -230,7 +231,7 @@ class DataLoader(Generic[Token]):
         in this function.
 
         Recommended implementation is by iterating through examples with ``read_sentence``, and store tokens into
-        :py:class:`Vocabulary` by simply accessing it like a dictionary.
+        :class:`Vocabulary` by simply accessing it like a dictionary.
 
         Here's a non-comprehensive what you'll (probably) need to take care of:
 
@@ -354,23 +355,23 @@ class DataLoader(Generic[Token]):
         """
         Common batching interface for all datasets. Three batching strategies are implemented:
 
-        - `_iterbatch_list`: List slice shuffling. List is chunked into batches while global order is preserved,
-          and only the chunk indices are shuffled. This is the preferred strategy if indexing (`__getitem__`) is
+        - ``_iterbatch_list``: List slice shuffling. List is chunked into batches while global order is preserved,
+          and only the chunk indices are shuffled. This is the preferred strategy if indexing (``__getitem__``) is
           implemented for the `iterdata` return value.
 
-        - `_iterbatch_bucket`: Put sentences in buckets according to their length, so each batch only contains
+        - ``_iterbatch_bucket``: Put sentences in buckets according to their length, so each batch only contains
           sentences of similar length.
 
-        - `_iterbatch_slide`: Partial shuffling with buffer. Data examples are stored in a buffer `window_scale` times
-          batch size, and shuffling is performed on the buffer. This strategy is enabled if `iterdata` does not
-          support indexing but shuffling is required.
+        - ``_iterbatch_slide``: Partial shuffling with buffer. Data examples are stored in a buffer ``window_scale``
+          times the batch size, and shuffling is performed on the buffer. This strategy is enabled if ``iterdata`` does
+          not support indexing but shuffling is required.
 
-        - `_iterbatch_iter`: Iterator-based batching without shuffle. This is the fallback strategy is no shuffling
+        - ``_iterbatch_iter``: Iterator-based batching without shuffle. This is the fallback strategy is no shuffling
           is required.
 
         You can override this method to post-process batches, e.g. transposing and padding.
 
-        Ordering: 'none', 'sort', 'bucket'.
+        Ordering: ``none``, ``sort``, ``bucket``.
 
         Note that ``kwargs`` is passed to ``iterdata`` only. In order to customize batching parameters, call underlying
         implementations explicitly.

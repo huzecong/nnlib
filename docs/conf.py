@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'nnlib'
-copyright = '2018, Zecong Hu'
+copyright = '2019, Zecong Hu'
 author = 'Zecong Hu'
 
 # The short X.Y version

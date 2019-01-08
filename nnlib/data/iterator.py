@@ -120,7 +120,7 @@ def bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence]
                     max_length: int = None, sort: bool = False) \
         -> Iterator[Tuple[List[Sentence], List[Sentence]]]:
     """
-    A wrapper over :method:`bitext_index_iterator` that returns the actual data examples instead of indices.
+    A wrapper over :func:`bitext_index_iterator` that returns the actual data examples instead of indices.
     """
     iterator = bitext_index_iterator(src_sents, tgt_sents, batch_size, max_length=max_length, sort=sort)
     for batch in iterator:

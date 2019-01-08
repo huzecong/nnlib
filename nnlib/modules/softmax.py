@@ -3,7 +3,7 @@ from typing import Optional, Sequence, Mapping, Union
 
 import numpy as np
 
-from .basic import Linear
+from .linear import Linear
 from .. import utils
 from ..torch import *
 
@@ -24,15 +24,21 @@ class Softmax(nn.Module):
 
     def forward(self, input: Tensor, target: torch.LongTensor, reduction='elementwise_mean',
                 ignore_index: Optional[int] = None, smoothing: float = 0.0) -> Tensor:
-        """
-        :param input: Input of shape batch_size * ... * embed_dim.
-        :param target: LongTensor of shape batch_size * ..., corresponding to indices. Each element should be in range
-            [0, vocab_size)
+        r"""
+        :param input: Input of shape ``batch_size * ... * embed_dim``.
+        :param target: LongTensor of shape ``batch_size * ...``, corresponding to indices. Each element should be in
+            range ``[0, vocab_size)``.
         :param reduction: Reduction setting as in :class:`nn.NLLLoss`.
         :param ignore_index: If specified, targets with this index is ignored and not used in reduction.
         :param smoothing: Label smoothing weight. The target distribution becomes:
-                          P(x) | (x == target) = 1 - smoothing
-                               | (x != target) = smoothing / (vocab_size - 1)
+
+            .. math::
+
+                P(x) = \begin{cases}
+                    1 - \mathrm{smoothing}                          & x = \mathrm{target} \\
+                    \mathrm{smoothing} / (\mathrm{vocab\_size} - 1) & x \neq \mathrm{target} \\
+                \end{cases}
+
         :return: Negative log-likelihood.
         """
         if target.device != self.linear.weight.device:

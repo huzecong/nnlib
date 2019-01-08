@@ -30,9 +30,12 @@ def _parse_ted_talks_dataset(directory: Path, dataset_path: Path):
 class TEDTalks(NMTDataset):
     """
     The TED talks multilingual dataset from:
-    [Qi et al. 2018] When and Why are Pre-trained Word Embeddings Useful for Neural Machine Translation?
 
-    Note: These languages are preprocessed by moses. The Thai language (th) has also been tokenized.
+    `[Qi et al. 2018] When and Why are Pre-trained Word Embeddings Useful for Neural Machine Translation?
+    <https://arxiv.org/abs/1804.06323>`_
+
+    .. note::
+        This dataset is preprocessed by Moses. The Thai language (``th``) has also been tokenized.
     """
 
     @classmethod
@@ -47,8 +50,9 @@ class TEDTalks(NMTDataset):
     @classmethod
     def load(cls, language: str, split: str = 'train', directory: PathType = 'data/', **kwargs) -> Path:
         """
-        :param language: Language abbreviation, see TED website for language names.
-        :param split: Data split to load, 'train', 'dev', or 'test'.
+        :param language: Language abbreviation, see `TED website
+            <https://www.ted.com/participate/translate/our-languages>`_ for language names.
+        :param split: Data split to load, ``train``, ``dev``, or ``test``.
         :param directory: Save directory (and load from directory if possible).
         :return: Paths to selected data splits.
         """

@@ -32,6 +32,31 @@ class _PersistentLocals(object):
 
 # noinspection PyPep8Naming
 def IPython_main(confirm=False):
+    """
+    When executing code in IPython using the ``%run`` magic, global variables are exposed to the REPL environment when
+    code finishes, or an exception is raised. This makes debugging or stage-by-stage execution easy because you can
+    manipulate variables afterwards.
+
+    However, this may not be sufficient under certain circumstances. A good paradigm is to keep everything in a
+    ``main()`` function, instead of under a ``if __name__ == '__main__'`` statement, because this keeps variables local
+    so they don't clash with other stuff (and the IDE doesn't warn you about shadowing names). But in this case, IPython
+    will not expose the local variables.
+
+    This decorator is used to expose local variables of a function into the global namespace upon exiting or raising
+    exceptions. It only functions when it is run inside IPython. You can use the decorator as follows:
+
+    .. code-block:: python
+
+        @IPython_main  # equivalent to @IPython_main()
+        def main(): ...
+
+        @IPython_main(confirm=True)
+        def main(): ...
+
+    .. warning::
+        This decorator is implemented via a custom profiler, which is called every time a function is called or is
+        about to return. The overhead is not tested, but it is likely to slow things down. Avoid when possible.
+    """
     import functools
     import typing
 

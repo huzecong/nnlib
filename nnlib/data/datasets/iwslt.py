@@ -41,7 +41,8 @@ def _parse_iwslt_dataset(directory: Path):
 
 class IWSLT(NMTDataset):
     """
-    Data from evaluation campaign of the International Workshop on Spoken Language Translation (IWSLT).
+    Data from `evaluation campaign <https://wit3.fbk.eu/>`_ of the International Workshop on Spoken Language
+    Translation (IWSLT).
     """
 
     @classmethod
@@ -81,8 +82,8 @@ class IWSLT(NMTDataset):
         :param version: IWSLT version (int), supports 2012 ~ 2018.
         :param source: Source language, two letter notation.
         :param target: Target language, two letter notation.
-        :param split: Data split to load, 'train', 'dev', or 'test'.
-        :param ver_tag: Tag for dev or test set (e.g. "TED.dev2012").
+        :param split: Data split to load, ``train``, ``dev``, or ``test``.
+        :param ver_tag: Tag for dev or test set (e.g. ``TED.dev2012``).
         :param directory: Save directory (and load from directory if possible).
         :return: Paths to selected data splits.
         """

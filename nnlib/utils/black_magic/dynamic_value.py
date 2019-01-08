@@ -3,22 +3,33 @@ import functools
 
 class DynamicValue:
     """
-    **Warning:** Black magic, use with caution!!
-
     Treat a function as the value it returns, for example::
 
-      x = 2; a = DynamicValue(lambda: x)
-      print 3 * a + 2  # 8
-      x = 4
-      print 3 * a + 2  # 14
+        >>> x = 2; a = DynamicValue(lambda: x)
+        >>> print(3 * a + 2)
+        8
+        >>> x = 4
+        >>> print(3 * a + 2)
+        14
 
     Since Python adopts duck typing, a value could be replaced by a function that returns values in specific type.
     This is useful when you need *dynamic* values that will be fed into some black-box function (given the value is
     not copied).
 
-    This is done by evaluating the function when building the :py:class:`DynamicValue` instance, and re-route all
+    This is done by evaluating the function when building the :class:`DynamicValue` instance, and re-route all
     methods calls to the value's method. This is called method dispatching, and is implemented at both instance-level
     and also class-level, because Python defaults instance-level methods to its class-level ones.
+
+    :param func: The function to dynamically evaluate.
+
+    .. warning::
+        This component is unstable and can easily break when used on functions that return complex classes or have
+        multiple return types. It also adds a lot of overhead. You should avoid using this class if you can, and if you
+        insist, use it on functions that:
+
+        - have no side-effects,
+        - return primitive types,
+        - is not often called.
     """
 
     def _dispatch(self, name, method):

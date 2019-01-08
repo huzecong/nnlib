@@ -28,7 +28,8 @@ class NMTDataset:
             -> Union[Path, Tuple[Path, ...]]:
         """
         Return the path to the specific data split.
-        :param split: Data split to load, usually 'train', 'dev', or 'test'.
+
+        :param split: Data split to load, usually ``train``, ``dev``, or ``test``.
         :param directory: Directory to store cached dataset.
         """
         raise NotImplementedError
