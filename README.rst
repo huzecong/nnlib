@@ -1,7 +1,6 @@
+=========
 nnlib 0.1
 =========
-
-Welcome to nnlib's documentation!
 
 nnlib is a Pytorch-based, type-annotated utilities for neural networks in Python 3.6+. It is designed with the following criteria in mind:
 

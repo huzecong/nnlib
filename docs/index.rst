@@ -22,12 +22,18 @@ Since nnlib is still in its early stages, PyPI packages are not provided. It is 
 
 .. code-block:: bash
 
-	cd /path/to/your/repo
-	git submodule add https://github.com/huzecong/nnlib.git
+   cd /path/to/your/repo
+   git submodule add https://github.com/huzecong/nnlib.git
 
-and just use away! ::
+and just use away!
 
-	import nnlib
+For code autocompletion in PyCharm to work, you would also need to mark the ``nnlib`` submodule root as sources root, which can be done by right-clicking the folder in the Project panel, and selecting "Mark Directory as... > Sources Root".
+
+To update the submodule to the newest version:
+
+.. code-block:: bash
+   
+   git submodule update --remote --recursive nnlib
 
 
 Contents
