@@ -33,7 +33,7 @@ To update the submodule to the newest version:
 Documentation
 =============
 
-The documentations are still in an early draft. They can be viewed at ...
+The documentations are still in an early draft. They can be viewed at https://nnlib.readthedocs.io/en/latest/\ .
 
 License
 =======
