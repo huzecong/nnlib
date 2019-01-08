@@ -1,2 +1,7 @@
 *.pyc
 
+# Build files
+build/
+dist/
+nnlib.egg-info/
+
