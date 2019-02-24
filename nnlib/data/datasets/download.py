@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _reporthook(t):
-    """ ``reporthook`` to use with ``urllib.request`` that prints the process of the download.
+    r""" ``reporthook`` to use with ``urllib.request`` that prints the process of the download.
 
     Uses ``tqdm`` for progress bar.
 
@@ -26,7 +26,7 @@ def _reporthook(t):
     last_b = [0]
 
     def inner(b=1, bsize=1, tsize=None):
-        """
+        r"""
         Args:
             b (int, optional): Number of blocks just transferred [default: 1].
             bsize (int, optional): Size of each block (in tqdm units) [default: 1].
@@ -76,7 +76,7 @@ def _download_file_from_drive(filename, url):  # pragma: no cover
 
 
 def _maybe_extract(compressed_filename, directory, extension=None):
-    """ Extract a compressed file to ``directory``.
+    r""" Extract a compressed file to ``directory``.
 
     Args:
         compressed_filename (str): Compressed file.
@@ -101,7 +101,7 @@ def _maybe_extract(compressed_filename, directory, extension=None):
 
 
 def _get_filename_from_url(url):
-    """ Return a filename from a URL
+    r""" Return a filename from a URL
 
     Args:
         url (str): URL to extract filename from
@@ -114,7 +114,7 @@ def _get_filename_from_url(url):
 
 
 def download_file_maybe_extract(url, directory, filename=None, extension=None, check_files=None):
-    """ Download the file at ``url`` to ``directory``. Extract to ``directory`` if tar or zip.
+    r""" Download the file at ``url`` to ``directory``. Extract to ``directory`` if tar or zip.
 
     Args:
         url (str): Url of file.
@@ -164,7 +164,7 @@ def download_file_maybe_extract(url, directory, filename=None, extension=None, c
 
 
 def _check_download(*filepaths, exception=False):
-    """ Check if the downloaded files are found.
+    r""" Check if the downloaded files are found.
 
     Args:
         filepaths (list of str): Check if these filepaths exist
@@ -181,7 +181,7 @@ def _check_download(*filepaths, exception=False):
 
 
 def download_files_maybe_extract(urls, directory, check_files=None):
-    """ Download the files at ``urls`` to ``directory``. Extract to ``directory`` if tar or zip.
+    r""" Download the files at ``urls`` to ``directory``. Extract to ``directory`` if tar or zip.
 
     Args:
         urls (str): Url of files.

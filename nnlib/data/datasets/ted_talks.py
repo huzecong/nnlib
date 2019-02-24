@@ -28,7 +28,7 @@ def _parse_ted_talks_dataset(directory: Path, dataset_path: Path):
 
 
 class TEDTalks(NMTDataset):
-    """
+    r"""
     The TED talks multilingual dataset from:
 
     `[Qi et al. 2018] When and Why are Pre-trained Word Embeddings Useful for Neural Machine Translation?
@@ -49,7 +49,7 @@ class TEDTalks(NMTDataset):
     # noinspection PyMethodOverriding
     @classmethod
     def load(cls, language: str, split: str = 'train', directory: PathType = 'data/', **kwargs) -> Path:
-        """
+        r"""
         :param language: Language abbreviation, see `TED website
             <https://www.ted.com/participate/translate/our-languages>`_ for language names.
         :param split: Data split to load, ``train``, ``dev``, or ``test``.

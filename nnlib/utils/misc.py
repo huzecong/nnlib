@@ -23,7 +23,8 @@ def progress(iterable: int, verbose=True, **kwargs) -> Iterable[int]:
 
 
 class _DummyTqdm:
-    """ A sequence wrapper that ignores everything """
+    r""" A sequence wrapper that ignores everything """
+
     def __init__(self, iterable):
         self.iterable = iterable  # could be None
 
@@ -95,7 +96,7 @@ def deprecated(new_func=None):
 
 
 def map_to_list(d):
-    """
+    r"""
     Given a dict mapping indices (continuous indices starting from 0) to values, convert it into a list.
 
     :type d: dict
@@ -118,7 +119,7 @@ def memoization(f):
 
 
 def reverse_map(d):
-    """
+    r"""
     Given a dict containing pairs of (`item`, `id`), return a list where the `id`-th element is `item`.
 
     Or, given a list containing a permutation, return its reverse.

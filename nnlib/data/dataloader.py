@@ -51,7 +51,7 @@ class Vocabulary(defaultdict, Generic[K, V]):
         super().__setitem__(key, value)
 
     def update(self, m: Union[K, Sequence[K]], **kwargs):
-        """"""
+        r""""""
         if isinstance(m, dict):
             super().update(m)
         elif isinstance(m, list):
@@ -92,7 +92,7 @@ Token = TypeVar('Token')
 
 
 class DataLoader(Generic[Token]):
-    """
+    r"""
     An abstract data loader interface for neural networks, utilities included:
 
     - :py:class:`Vocabulary` for automatic token indexing and mapping.
@@ -120,7 +120,7 @@ class DataLoader(Generic[Token]):
 
     def __init__(self, file_path: Union[Path, Mapping[str, Union[Path, List[Path]]], List[Path]],
                  name: Optional[str] = None, _vocab_path: Optional[Path] = None):
-        """
+        r"""
         When subclassing :py:class:`DataLoader`, you should define your vocabularies in the subclass ``__init__``
         method, and **THEN** call the super-class ``__init__`` method.
 
@@ -206,7 +206,7 @@ class DataLoader(Generic[Token]):
                 pickle.dump(dict(vocab), f)
 
     def __len__(self) -> int:
-        """
+        r"""
         Return dataset size. This is not really important and is only useful when you want a accurate epoch progress.
 
         However, it is still recommended to implement this as a sanity check.
@@ -216,7 +216,7 @@ class DataLoader(Generic[Token]):
         raise NotImplementedError
 
     def read_example(self, tag: Optional[str] = None, verbose=False) -> Iterable[Any]:
-        """
+        r"""
         Iterate over examples. You should read the files according to ``self.file_path`` (or ``self.file_path[tag]``
         if ``tag`` is specified).
 
@@ -226,7 +226,7 @@ class DataLoader(Generic[Token]):
         raise NotImplementedError
 
     def generate_vocab(self):
-        """
+        r"""
         Called when loading dataset for the first time. You should generate vocabularies and add special tokens
         in this function.
 
@@ -246,7 +246,7 @@ class DataLoader(Generic[Token]):
         pass
 
     def preprocess(self):
-        """
+        r"""
         Called after vocabulary is loaded or generated. This is when you read and preprocess your data.
 
         - For smaller datasets, you should read in all data.
@@ -266,7 +266,7 @@ class DataLoader(Generic[Token]):
         pass
 
     def iterdata(self, tag: Optional[str] = None, *args, **kwargs) -> Iterable[List[Token]]:
-        """
+        r"""
         Return an iterator allowing per-example iteration of data.
 
         For smaller datasets, you could simply return the list containing the whole dataset. This has benefits in
@@ -277,7 +277,7 @@ class DataLoader(Generic[Token]):
     @classmethod
     def _iterbatch_list(cls, data: List[List[Token]], size: int, shuffle=False, different_size=True) \
             -> Iterator[List[List[Token]]]:
-        """
+        r"""
         List slice shuffling. Local order is preserved (useful for data presorted by sentence length).
         """
         length = len(data)
@@ -291,7 +291,7 @@ class DataLoader(Generic[Token]):
     @classmethod
     def _iterbatch_slide(cls, data_iter: Iterable[List[Token]], size: int, window_scale: int = 10) \
             -> Iterator[List[List[Token]]]:
-        """
+        r"""
         Sliding window-based shuffling.
         """
         window_size = size * window_scale
@@ -311,7 +311,7 @@ class DataLoader(Generic[Token]):
     @classmethod
     def _iterbatch_iter(cls, data_iter: Iterable[List[Token]], size: int, different_size=False) \
             -> Iterator[List[List[Token]]]:
-        """
+        r"""
         Simple batching with no reordering.
         """
         first_batch = None
@@ -352,7 +352,7 @@ class DataLoader(Generic[Token]):
 
     def iterbatch(self, batch_size: int, tag: Optional[str] = None, shuffle=True, ordering='none',
                   *args, **kwargs) -> Iterator[List[List[Token]]]:
-        """
+        r"""
         Common batching interface for all datasets. Three batching strategies are implemented:
 
         - ``_iterbatch_list``: List slice shuffling. List is chunked into batches while global order is preserved,
@@ -400,7 +400,7 @@ class DataLoader(Generic[Token]):
     @classmethod
     def sort_vocabulary(cls, word_vocab: Vocabulary[K, V], word_freq: Vocabulary[int, int]) \
             -> Tuple[Vocabulary[K, V], Vocabulary[int, int]]:
-        """
+        r"""
         Sort vocabulary according to frequency. After sorting, most frequent word has index ``0``, and least frequent
         word has index ``len(vocab) - 1``.
 
@@ -432,7 +432,7 @@ class DataLoader(Generic[Token]):
                          max_size: Optional[int] = None, min_freq: Optional[int] = None, verbose=False,
                          meta_data: Vocabulary[str, int] = None, keep_words: Optional[List[str]] = None) \
             -> Tuple[Vocabulary[str, V], Vocabulary[int, int]]:
-        """
+        r"""
         Prune vocabulary according to frequency.
 
         :param word_vocab: Vocabulary to prune.

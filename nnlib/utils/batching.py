@@ -24,7 +24,7 @@ def _minibatches_from(data, size=16, shuffle=True, different_size=False):
 
 
 def minibatches_from(data, size=16, shuffle=True, different_size=False):
-    """
+    r"""
     A low-level API to directly create mini-batches from a list.
 
     :param data: Data to create mini-batches for.
@@ -43,7 +43,7 @@ T = TypeVar('T')
 
 
 def pad_sequences(seqs: List[List[int]], batch_first=False, pad: int = -1) -> LongTensor:
-    """
+    r"""
     A wrapper around :func:`nn.utils.rnn.pad_sequence` that takes a list of lists, and converts it into a list of
     :class:`torch.LongTensor`\ s.
     """
@@ -61,7 +61,7 @@ def batch_sequences(seqs: Sequence[Sequence[T]], *args: Sequence, ordered=False)
 
 
 def batch_sequences(seqs, *args, ordered=False):
-    """
+    r"""
     Given a batch from data loader, convert it into PyTorch :class:`PackedSequence`.
 
     Since :class:`PackedSequence` requires sequences to be sorted in reverse order of their length, batch elements are
@@ -86,7 +86,7 @@ def batch_sequences(seqs, *args, ordered=False):
 
 
 def shift_packed_seq(seq: PackedSequence, start: int = 0) -> PackedSequence:
-    """
+    r"""
     Shifts the :class:`PackedSequence`, i.e. return the substring starting from ``start``.
 
     :param seq: The sequence to truncate.
@@ -99,7 +99,7 @@ def shift_packed_seq(seq: PackedSequence, start: int = 0) -> PackedSequence:
 
 
 def mask_dropout_embeddings(strs: Sequence[Sequence[T]], dropout_prob: float, transposed=False) -> np.ndarray:
-    """
+    r"""
     Generate mask for embedding dropout, each word type is either dropped out as a whole
     or scaled according to the dropout probability.
 

@@ -24,14 +24,14 @@ class FNVHash:
 
 
 def ceil_div(a, b):
-    """
+    r"""
     Integer division that rounds up.
     """
     return (a + b - 1) // b
 
 
 def normalize(xs):
-    """
+    r"""
     NumPy-based normalization.
     """
     arr = np.asarray(xs, dtype=np.float)
@@ -40,7 +40,7 @@ def normalize(xs):
 
 # noinspection PyShadowingBuiltins
 def pow(a, b, fast=True):
-    """
+    r"""
     Compute ``a ** b`` (``a`` raised to ``b``-th power). ``b`` has to be a positive integer.
 
     **Note:** It is not required for ``type(a)`` to have an identity element.
@@ -70,7 +70,7 @@ def pow(a, b, fast=True):
 
 
 def _reduce(fn, *args):
-    """
+    r"""
     Recursively reduce over sequence of values, where values can be sequences. None values are ignored.
 
     :type fn: (Any, Any) -> Any
@@ -87,7 +87,7 @@ def _reduce(fn, *args):
 
 
 def _ireduce(fn, *args):
-    """
+    r"""
     In-place version of ``_reduce``.
 
     :type fn: (Any, Any) -> None
@@ -97,7 +97,7 @@ def _ireduce(fn, *args):
 
 
 def prod(*args):
-    """
+    r"""
     Compute product of arguments, ignoring ``None`` values. Arguments could contain lists, or list of lists, etc.
 
     **Note:** It is not required for list elements to have an identity element.
@@ -107,7 +107,7 @@ def prod(*args):
 
 # noinspection PyShadowingBuiltins
 def sum(*args):
-    """
+    r"""
     Compute sum of arguments, ignoring ``None`` values. Arguments could contain lists, or list of lists, etc.
 
     **Note:** It is not required for list elements to have an identity element.
@@ -116,7 +116,7 @@ def sum(*args):
 
 
 def random_subset(total, size):
-    """
+    r"""
     Select a random subset of size ``size`` from the larger set of size ``total``.
 
     This method is implemented to replace :func:`numpy.random.choice` with :attr:`replacement=False`.

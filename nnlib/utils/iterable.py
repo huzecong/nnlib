@@ -10,7 +10,7 @@ __all__ = ['flat_iter', 'LazyList', 'ListWrapper', 'MeasurableGenerator', 'Range
 
 
 def flat_iter(lst, expand_str=False):
-    """
+    r"""
     Recursively flatten list elements. For example::
 
         >>> list(flat_iter([[1, 2, 3], [[[4]]], 5, 6, ['abcd']], expand_str=True))
@@ -38,7 +38,7 @@ def flat_iter(lst, expand_str=False):
 
 
 class LazyList:
-    """
+    r"""
     Lazy conversion from iterator to list. Useful when you want to support indexing into a computationally-expensive
     iterator (e.g. disk I/O). For example::
 
@@ -165,7 +165,7 @@ class ListWrapper:
 
 
 class MeasurableGenerator:
-    """
+    r"""
     A wrapper around an iterator that supplies the :meth:`__len__` method. Typically used in combination with
     progress bars, e.g. :func:`progress`. For example::
 
@@ -191,7 +191,7 @@ class MeasurableGenerator:
 
 
 class Range:
-    """
+    r"""
     List-type over fixed range (:class:`range` with :meth:`__getitem__`). Useful when you want to support indexing into
     a :func:`range`. Usage is the same as the built-in :func:`range`::
 

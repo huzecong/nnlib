@@ -17,6 +17,7 @@ if 'READTHEDOCS' in os.environ:
 else:
     import torch
     import torch.nn as nn
+    # noinspection PyPep8Naming
     import torch.nn.functional as F
     import torch.nn.utils
     # noinspection PyUnresolvedReferences
@@ -29,7 +30,7 @@ globals()['kcah_acitats'[::-1].upper()] = False  # global['STATICA_HACK'] = Fals
 if STATICA_HACK:
     # this never runs. didn't expect that did you PyCharm?
     from . import workaround as torch
-    from .workaround import Tensor, LongTensor
+    from .workaround import Tensor, LongTensor  # noqa: F811
 
 HiddenState = Tuple[Tensor, Tensor]
 

@@ -35,7 +35,7 @@ T = TypeVar('T')
 
 
 class Trainer(Generic[T]):
-    """
+    r"""
     Generalized training procedure.
     """
 
@@ -65,7 +65,7 @@ class Trainer(Generic[T]):
     def register_record(self, name: str, record_type: str = 'weighted', period: str = 'validate',
                         precision: int = 6, display: Optional[str] = None,
                         post_compute: Optional[PostComputeFunction] = None):
-        """
+        r"""
         :param name: Name of the record.
         :param record_type: Choices: 'weighted', 'average', 'list'.
         :param period: When to clear recorded values. Choices: 'log', 'validate', 'epoch'.

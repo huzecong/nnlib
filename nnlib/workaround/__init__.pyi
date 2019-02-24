@@ -1844,6 +1844,14 @@ def randint_like(input: Tensor, low: int, high: int, *, dtype: dtype = None, lay
                  device: Union[device, str, None] = None, requires_grad: bool = False) -> Tensor: ...
 
 @overload
+def randint(high: int, size: Tuple[int, ...], *, dtype: dtype = None, layout: layout = None,
+            device: Union[device, str, None] = None, requires_grad: bool = False) -> Tensor: ...
+
+@overload
+def randint(low: int, high: int, size: Tuple[int, ...], *, dtype: dtype = None, layout: layout = None,
+                 device: Union[device, str, None] = None, requires_grad: bool = False) -> Tensor: ...
+
+@overload
 def randn(*size: int, generator: Generator, out: Optional[Tensor] = None, dtype: dtype = None, layout: layout = strided,
           device: Union[device, str, None] = None, requires_grad: bool = False) -> Tensor: ...
 

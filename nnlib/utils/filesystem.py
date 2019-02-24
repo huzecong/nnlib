@@ -8,7 +8,7 @@ PathType = Union[str, Path]  # a union type for all possible paths
 
 
 def path_lca(this: Path, other: PathType) -> Path:
-    """
+    r"""
     Return the `lowest common ancestor <https://en.wikipedia.org/wiki/Lowest_common_ancestor>`_ of two paths.
     For example::
 
@@ -26,7 +26,7 @@ def path_lca(this: Path, other: PathType) -> Path:
 
 
 def path_add_suffix(this: Path, suffix: str) -> Path:
-    """
+    r"""
     Append a suffix to the given path. For example::
 
         >>> path_add_suffix(Path("/path/to/file.txt", "bak"))

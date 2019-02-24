@@ -31,7 +31,7 @@ MaybeList = Union[T, List[T]]
 
 
 class MLP(nn.Module):
-    """
+    r"""
     Multi-layer perceptron. A convenient interface to stacked fully-connected layers. Each layer is a linear followed
     by an optional activation, with optional dropout.
 
@@ -137,7 +137,7 @@ class MLP(nn.Module):
                     nn.init.uniform_(linear.bias, -std, std)
 
     def forward(self, xs: Tensor) -> Tensor:
-        """"""
+        r""""""
         for linear, activation, dropout in zip(self.layers, self.activations, self.dropouts):
             if dropout > 0.0:
                 xs = F.dropout(xs, dropout, self.training)
@@ -146,7 +146,7 @@ class MLP(nn.Module):
 
 
 class FC:
-    """
+    r"""
     Fully-connected layer. A wrapper for 1-layer MLP.
     """
 

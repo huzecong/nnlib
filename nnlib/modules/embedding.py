@@ -10,7 +10,7 @@ __all__ = ['Embedding']
 
 
 class Embedding(nn.Embedding):
-    """
+    r"""
     Wrapper over :py:class:`nn.Embedding`.
 
     - Uses ``gensim`` to load embeddings, so simply specify embedding type and file path.
@@ -34,7 +34,7 @@ class Embedding(nn.Embedding):
         ...
 
     def forward(self, input):
-        """
+        r"""
         :param input: A :class:`~torch.LongTensor`, or a :class:`~torch.utils.rnn.PackedSequence`.
         :return: A :class:`~torch.Tensor`, or a :class:`~torch.utils.rnn.PackedSequence`.
         """
@@ -58,7 +58,7 @@ class Embedding(nn.Embedding):
             return embed
 
     def __getitem__(self, item: Union[int, List[int]]) -> Tensor:
-        """
+        r"""
         A convenience wrapper for native Python types.
         """
         if isinstance(item, int):
@@ -67,7 +67,7 @@ class Embedding(nn.Embedding):
         return self.forward(item)
 
     def reset_parameters(self) -> None:
-        """
+        r"""
         Default initialization in PyTorch uses unit normal distribution. Here we simply use uniform.
         """
         self.weight.data.uniform_(-0.1, 0.1)
@@ -78,7 +78,7 @@ class Embedding(nn.Embedding):
     @classmethod
     def from_pretrained(cls, embed_type: str, embed_path: Path, word_vocab: Vocabulary, embed_dim: int,
                         freeze=True, sparse=False) -> 'Embedding':
-        """
+        r"""
         Creates an :class:`Embedding` instance from external pretrained embeddings.
 
         :param embed_type: Type of the embedding, can be ``word2vec`` or ``fasttext``.

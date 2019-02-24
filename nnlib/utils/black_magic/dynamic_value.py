@@ -2,7 +2,7 @@ import functools
 
 
 class DynamicValue:
-    """
+    r"""
     Treat a function as the value it returns, for example::
 
         >>> x = 2; a = DynamicValue(lambda: x)

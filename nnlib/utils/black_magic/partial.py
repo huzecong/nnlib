@@ -7,7 +7,7 @@ raise NotImplementedError
 
 
 def partial(*default_args, **default_kwargs):
-    """
+    r"""
     The builtin `functools.partial` is slow; use this instead.
     NOTE: Efficiency is achieved by sacrificing features, this method does not support:
         - Extendable variadic arguments (*args). If the given function contains `*args`, and you supplied more

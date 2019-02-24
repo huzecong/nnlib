@@ -17,7 +17,7 @@ def scanl(func: Callable[[B, A], B], lst: Sequence[A], initial: B) -> List[B]: .
 
 
 def scanl(func, lst, initial=None):
-    """
+    r"""
     Computes the intermediate results of :func:`reduce`. Equivalent to Haskell's ``scanl``. For example::
 
         >>> scanl(operator.add, [1, 2, 3, 4], 0)
@@ -49,7 +49,7 @@ def scanr(func: Callable[[B, A], B], lst: Sequence[A], initial: B) -> List[B]: .
 
 
 def scanr(func, lst, initial=None):
-    """
+    r"""
     Computes the intermediate results of :func:`reduce` applied in reverse. Equivalent to Haskell's ``scanr``.
     For example::
 
@@ -74,21 +74,21 @@ def scanr(func, lst, initial=None):
 
 
 def is_none(x: Optional[Any]) -> bool:
-    """
+    r"""
     Returns whether the argument is ``None``.
     """
     return x is None
 
 
 def not_none(x: Optional[Any]) -> bool:
-    """
+    r"""
     Returns whether the argument is not ``None``.
     """
     return x is not None
 
 
 def filter_none(x: Iterable[Optional[A]]) -> Iterable[A]:
-    """
+    r"""
     Filters not-\ ``None`` elements in list. Returns a generator.
     """
     return filter(not_none, x)
@@ -96,7 +96,7 @@ def filter_none(x: Iterable[Optional[A]]) -> Iterable[A]:
 
 def split_according_to(criterion: Callable[[A], bool], _list: Sequence[A], empty_segments=False) \
         -> Iterator[Sequence[A]]:
-    """
+    r"""
     Find elements in list where ``criterion`` is satisfied, and split list into sub-lists by dropping those elements.
 
     :type criterion: (Any) -> bool
@@ -117,7 +117,7 @@ def split_according_to(criterion: Callable[[A], bool], _list: Sequence[A], empty
 
 
 def split_by(sep: A, _list: Sequence[A], empty_segments=False) -> Iterator[Sequence[A]]:
-    """
+    r"""
     Split list into sub-lists by dropping elements that matches ``sep``.
 
     :param sep: Separator token.

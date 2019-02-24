@@ -8,7 +8,7 @@ __all__ = ['is_cuda', 'device', 'prevent_oom']
 
 
 def is_cuda(module: nn.Module) -> bool:
-    """
+    r"""
     Returns whether a module is on GPU, assuming that all parameters of a model are on the same device.
     """
     try:
@@ -19,7 +19,7 @@ def is_cuda(module: nn.Module) -> bool:
 
 @memoization
 def device(module: nn.Module) -> torch.device:
-    """
+    r"""
     Returns which device stores parameters of a module.
     """
     return next(module.parameters()).device
@@ -36,7 +36,7 @@ def save_checkpoint(model: nn.Module, optim: torch.optim.Optimizer,
 
 
 def prevent_oom(func):
-    """
+    r"""
     A function decorator that catches CUDA out of memory exceptions, triggers forced GC, and reruns the function.
     """
 
@@ -49,11 +49,11 @@ def prevent_oom(func):
     first_time = True
 
     @functools.wraps(func)
-    def wrapped(model, optim, *args, **kwargs):
+    def wrapped(model, *args, **kwargs):
         # TODO: is there a better way to inspect training loop stats?
         nonlocal first_time
         try:
-            result = func(model, optim, *args, **kwargs)
+            result = func(model, *args, **kwargs)
             first_time = False
             return result
         except RuntimeError as e:
@@ -62,10 +62,10 @@ def prevent_oom(func):
                 Logging.warn(f"CUDA out of memory error caught. " + _cuda_memory_str())
                 gc.collect()
                 torch.cuda.empty_cache()
-                Logging.info(f"Forced GC complete. " + _cuda_memory_str())
+                Logging.warn(f"Forced GC complete. " + _cuda_memory_str())
                 # now let's try again
                 try:
-                    result = func(model, optim, *args, **kwargs)
+                    result = func(model, *args, **kwargs)
                     first_time = False
                     return result
                 except RuntimeError as e:

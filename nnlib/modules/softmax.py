@@ -11,7 +11,7 @@ __all__ = ['Softmax', 'AdaptedSoftmax']
 
 
 class Softmax(nn.Module):
-    """
+    r"""
     Softmax for classification. You know what I mean.
 
     Follows the same interface as :py:class:`AdaptedSoftmax`.
@@ -73,14 +73,14 @@ class Softmax(nn.Module):
 
 
 class AdaptedSoftmax(nn.AdaptiveLogSoftmaxWithLoss):
-    """
+    r"""
     Wrapper over :py:class:`torch.nn.AdaptiveLogSoftmaxWithLoss`. Maintains a mapping of data indices to softmax
     indices based on frequency.
     """
 
     def __init__(self, vocab_size: int, embed_dim: int, vocab_freq: Union[Mapping[int, int], Sequence[int]],
                  cutoffs: Optional[Sequence[int]] = None, **kwargs):
-        """
+        r"""
         :type vocab_freq: list of int
         :type cutoffs: None | list of int
 

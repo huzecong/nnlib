@@ -32,7 +32,7 @@ class _PersistentLocals(object):
 
 # noinspection PyPep8Naming
 def IPython_main(confirm=False):
-    """
+    r"""
     When executing code in IPython using the ``%run`` magic, global variables are exposed to the REPL environment when
     code finishes, or an exception is raised. This makes debugging or stage-by-stage execution easy because you can
     manipulate variables afterwards.

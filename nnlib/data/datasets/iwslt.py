@@ -40,7 +40,7 @@ def _parse_iwslt_dataset(directory: Path):
 
 
 class IWSLT(NMTDataset):
-    """
+    r"""
     Data from `evaluation campaign <https://wit3.fbk.eu/>`_ of the International Workshop on Spoken Language
     Translation (IWSLT).
     """
@@ -78,7 +78,7 @@ class IWSLT(NMTDataset):
     def load(cls, version: int, source: str, target: str, *,
              split: str = 'train', ver_tag: Optional[str] = None, directory: PathType = 'data/') \
             -> Tuple[Path, Path]:
-        """
+        r"""
         :param version: IWSLT version (int), supports 2012 ~ 2018.
         :param source: Source language, two letter notation.
         :param target: Target language, two letter notation.

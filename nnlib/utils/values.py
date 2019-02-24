@@ -9,7 +9,7 @@ __all__ = ['AnnealedValue', 'LambdaValue', 'MilestoneCounter',
 
 
 class AnnealedValue:
-    """
+    r"""
     Linearly interpolate values given keyframes. A keyframe is a tuple of `(iteration, value)`, and values for
     iterations in between keyframes are interpolated linearly.
 
@@ -47,7 +47,7 @@ class AnnealedValue:
                                   "Did you call `bind_to` on `Arguments`?")
 
     def value(self, iteration):
-        """
+        r"""
         Return the value at a specific iteration.
 
         :param iteration: The iteration.
@@ -72,7 +72,7 @@ class LambdaValue(object):
                                   "Did you call `bind_to` on `Arguments`?")
 
     def value(self, iteration):
-        """
+        r"""
         Return the value at a specific iteration.
 
         :param iteration: The iteration.
@@ -81,7 +81,7 @@ class LambdaValue(object):
 
 
 class MilestoneCounter(object):
-    """
+    r"""
     Equally distribute milestones according to progress. Keep track of current progress.
     """
 
@@ -95,7 +95,7 @@ class MilestoneCounter(object):
         self.progress_ += amount
 
     def milestone(self):
-        """
+        r"""
         :return: How many milestones have passed since last query.
         """
         count = 0

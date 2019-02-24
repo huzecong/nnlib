@@ -14,7 +14,7 @@ LangPair = Tuple[str, str]  # a pair of language specifiers
 def bucketed_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
                              max_length: int = None) \
         -> Iterator[List[int]]:
-    """
+    r"""
     Return an iterator generating batches over bi-text bucketed by length. Each batch only contains examples with
     source sentences of the same length.
 
@@ -51,7 +51,7 @@ def bucketed_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[
 def sorted_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
                            max_length: int = None, bins: Sequence[int] = None) \
         -> Iterator[List[int]]:
-    """
+    r"""
     Return an iterator generating batches over bi-text. Examples in a batch are of similar length, and are sorted in
     descending order of source sentence length.
 
@@ -99,7 +99,7 @@ def sorted_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Se
 def bitext_index_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
                           max_length: int = None, sort: bool = False) \
         -> Iterator[List[int]]:
-    """
+    r"""
     A convenient interface that calls other bi-text iterator functions. Returns an iterator over example indices.
 
     :param src_sents: List of source sentences.
@@ -119,7 +119,7 @@ def bitext_index_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sen
 def bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
                     max_length: int = None, sort: bool = False) \
         -> Iterator[Tuple[List[Sentence], List[Sentence]]]:
-    """
+    r"""
     A wrapper over :func:`bitext_index_iterator` that returns the actual data examples instead of indices.
     """
     iterator = bitext_index_iterator(src_sents, tgt_sents, batch_size, max_length=max_length, sort=sort)
@@ -135,7 +135,7 @@ BatchValue = TypeVar('BatchValue')
 
 def multi_dataset_iterator(iterators: Mapping[Key, Iterator[BatchValue]]) \
         -> Iterator[Tuple[Key, BatchValue]]:
-    """
+    r"""
     An iterator that first chooses a dataset at random, then returns a batch from that dataset.
 
     :param iterators: A dictionary mapping keys to iterators.

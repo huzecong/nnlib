@@ -26,7 +26,7 @@ class NMTDataset:
     @classmethod
     def load(cls, *, split: str = 'train', directory: PathType = 'data/', **kwargs) \
             -> Union[Path, Tuple[Path, ...]]:
-        """
+        r"""
         Return the path to the specific data split.
 
         :param split: Data split to load, usually ``train``, ``dev``, or ``test``.

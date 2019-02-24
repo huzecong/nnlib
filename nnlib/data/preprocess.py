@@ -58,7 +58,7 @@ def get_tokenization_args(tokenizer: Optional[str], lowercase: bool) -> str:
 
 def tokenize(path: Path, tokenizer: Optional[str], lang: Optional[str] = None, lowercase: bool = False,
              directory: PathType = 'data/tokenize', **tok_kwargs) -> Path:
-    """
+    r"""
     Tokenize an input file or load the cached version.
 
     Available tokenizers and required fields:
