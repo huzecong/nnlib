@@ -1,8 +1,12 @@
 import functools
+from typing import Callable, Any
+
+Validator = Callable[[Any], bool]
 
 
 class ValidationError(ValueError):
-    pass
+    def __init__(self, arg, val, vtor):
+        super().__init__(f"Argument '{arg}' failed validator '{vtor}' with value: {val!r}")
 
 
 def validator(nullable=False, default=None):
@@ -15,10 +19,14 @@ def validator(nullable=False, default=None):
             if this_nullable is None:
                 raise ValueError(f"You must specify whether validator \"{f.__name__}\" is nullable or not.")
 
+            @functools.wraps(f)
             def call(value, **kw):
                 if value is None:
                     return this_nullable
                 return f(value, **kw)
+
+            if nullable:
+                call.__name__ += f'(nullable={this_nullable})'
 
             return call
 

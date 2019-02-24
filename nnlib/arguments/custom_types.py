@@ -4,7 +4,7 @@ from pathlib import Path
 
 from .validator import ValidationError
 
-__all__ = ['NoneType', 'Path', 'Choices']
+__all__ = ['NoneType', 'Path', 'Choices', 'is_choices']
 
 NoneType = type(None)
 
@@ -47,3 +47,11 @@ class _Choices(typing._FinalTypingBase, _root=True):
 
 
 Choices = _Choices(_root=True)
+
+
+def is_choices(typ) -> bool:
+    """
+    Check whether a type is a choices type. This cannot be checked using traditional methods,
+    since Choices is a metaclass.
+    """
+    return type(typ) is type(Choices)

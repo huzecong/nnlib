@@ -1,36 +1,48 @@
 import ast
 import enum
+import inspect
 import re
 import sys
-import types
-import typing
 from pathlib import Path
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
+from nnlib.arguments.custom_types import NoneType, is_choices
 from nnlib.utils import Logging
 from . import custom_types
-from .validator import ValidationError
+from .validator import ValidationError, Validator
+
+
+class ArgumentError(Exception):
+    pass
 
 
 class Arguments:
-    """
+    r"""
 
     """
 
-    _reserved_keys = ['Switch', 'validate', 'Enum']
+    _reserved_keys_cls = ['switch', 'enum']
+    _reserved_keys_method = ['validate', 'preprocess', 'postprocess', 'to_string']
+    _reserved_keys_other = ['help']
+    _reserved_keys = _reserved_keys_cls + _reserved_keys_method + _reserved_keys_other
 
     class Enum(enum.Enum):
+        # noinspection PyMethodParameters
         def _generate_next_value_(name, start, count, last_values):
+            # support return-type-polymorphism:   a, b, c = auto()
             return name
 
         def __eq__(self, other):
             return self.value == other or super().__eq__(other)
 
     class Switch:
-        """
+        r"""
         A flag argument that takes no values. Similar to the :attr:`action='store_true'` setting of :mod:`argparse`.
         """
-        def __init__(self):
-            self._value = False
+
+        def __init__(self, default=False):
+            self._default = default
+            self._value = default
 
         def __bool__(self):
             return self._value
@@ -43,17 +55,128 @@ class Arguments:
     def _check_types(self):
         pass
 
-    def __init__(self, **kwargs):
+    class _ArgTypeSpec(NamedTuple):
+        typ: type
+        nullable: bool
+        required: bool
+        default: Any
+
+    @classmethod
+    def _check_reserved(cls, arg_name) -> bool:
+        """
+        Check whether an argument name is reserved.
+        """
+        key = arg_name.lower()
+        if key not in Arguments._reserved_keys:
+            return False
+        if key in Arguments._reserved_keys_other:
+            return True
+        if key in Arguments._reserved_keys_cls and getattr(cls, arg_name) is not getattr(Arguments, arg_name):
+            return True
+        if key in Arguments._reserved_keys_method and not inspect.ismethod(getattr(cls, arg_name)):
+            return True
+        return False
+
+    # TODO
+    @classmethod
+    def _parse_type_spec(cls) -> Dict[str, _ArgTypeSpec]:
+        """
+        :return: A dict mapping argument names to their type-specs
+        """
+        _attr_name = '__type_dict__'
+        if hasattr(cls, _attr_name):
+            return getattr(cls, _attr_name)
+
+        type_dict = {}
+
+        # get annotations from the current class and all its base classes as well
+        annotations = {}
+        for base in reversed(cls.__mro__):
+            if base not in [object, Arguments]:
+                annotations.update(base.__dict__.get('__annotations__', {}))
+
+        bad_names = []
+        warn_names = []
+
+        def check_name_conventions(name):
+            if name.startswith('_') or name.endswith('_'):
+                # names should not start or begin with underscores
+                bad_names.append(name)
+            if name != name.lower() or any(ord(c) >= 128 for c in name):
+                # names are recommended to contain non-uppercase ASCII characters only
+                warn_names.append(name)
+
+        # check that all attributes are annotated, except for `Switch`es
+        for arg_name in dir(cls):
+            if arg_name.startswith('__') or cls._check_reserved(arg_name):  # magic stuff
+                continue
+            arg_val = getattr(cls, arg_name)
+            if isinstance(arg_val, Arguments.Switch):
+                check_name_conventions(arg_name)
+                # noinspection PyProtectedMember,PyCallByClass
+                type_dict[arg_name.lower()] = Arguments._ArgTypeSpec(
+                    Arguments.Switch, nullable=False, required=False, default=arg_val._default)
+            elif arg_name not in cls.__annotations__:
+                raise ArgumentError(f"Type is not specified for argument '{arg_name}'. "
+                                    f"Type annotation can omitted only when argument is a `Switch`.")
+
+        # iterate over annotated values and generate type-specs
+        for arg_name, arg_typ in annotations.items():
+            if cls._check_reserved(arg_name):
+                raise ArgumentError(f"'{arg_name}' cannot be used as argument name because it is reserved.")
+
+            check_name_conventions(arg_name)
+
+            nullable = False
+            # hacky check of whether `arg_typ` is `Optional`: `Optional` is `Union` with `type(None)`
+            if getattr(arg_typ, '__origin__', None) is Union and NoneType in arg_typ.__args__:
+                nullable = True
+                # extract the type wrapped inside `Optional`
+                arg_typ = next(t for t in arg_typ.__args__ if not isinstance(t, NoneType))  # type: ignore
+
+            arg_val = getattr(cls, arg_name, None)
+            required = not hasattr(cls, arg_name) or (arg_val is None and not nullable)
+            type_dict[arg_name] = Arguments._ArgTypeSpec(
+                arg_typ, nullable=nullable, required=required, default=arg_val)
+
+        if len(bad_names) > 0:
+            bad_names_str = ', '.join(f"'{s}'" for s in bad_names)
+            raise ArgumentError(f"Invalid argument names: {bad_names_str}. "
+                                f"Names cannot begin or end with underscores.")
+        if len(warn_names) > 0:
+            warn_names_str = ', '.join(f"'{s}'" for s in warn_names)
+            Logging.warn(f"Consider changing these argument names: {warn_names_str}. "
+                         f"Names are recommended to contain non-uppercase ASCII characters only.")
+
+        setattr(cls, _attr_name, type_dict)
+        return type_dict
+
+    @classmethod
+    def _parse_help(cls) -> Dict[str, str]:
+        pass
+
+    def __init__(self, **kwargs) -> None:
         self._check_types()
 
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+        # TODO: Add non-null checks
+        # TODO: Add "no-" prefix stuff for switches
+        # TODO: Generate help by inspecting comments
+
         i = 1
         while i < len(sys.argv):
-            arg = sys.argv[i]
+            arg: str = sys.argv[i]
             if arg.startswith('--'):
                 argname = arg[2:].replace('-', '_')
+                if argname.startswith('no_') and not hasattr(self, argname) and hasattr(self, argname[3:]):
+                    attr = getattr(self, argname[3:])
+                    if isinstance(attr, Arguments.Switch):
+                        attr._value = False
+                        i += 1
+                        continue
+
                 if hasattr(self, argname):
                     attr = getattr(self, argname)
                     if isinstance(attr, Arguments.Switch):
@@ -64,14 +187,18 @@ class Arguments:
                     typ = self.__annotations__.get(argname, type(attr))
                     nullable = False
                     # TODO: hacks here
-                    if hasattr(typ, '__origin__') and typ.__origin__ == typing.Union and type(None) in typ.__args__:
+                    if hasattr(typ, '__origin__') and typ.__origin__ == Union and type(None) in typ.__args__:
                         # hacky check of whether `typ` is `Optional`
                         nullable = True
                         typ = next(t for t in typ.__args__ if not isinstance(t, custom_types.NoneType))  # type: ignore
                     argval: str = sys.argv[i + 1]
                     if argval.lower() == 'none':
-                        assert nullable, f"Argument '{argname}' is not nullable"
-                        val = None
+                        if nullable:
+                            val = None
+                        else:
+                            assert typ is str or is_choices(typ), \
+                                f"Cannot assign None to non-nullable, non-str argument '{argname}'"
+                            val = argval
                     elif isinstance(typ, custom_types.NoneType):  # type: ignore
                         val = None  # just to suppress "ref before assign" warning
                         try:
@@ -87,11 +214,11 @@ class Arguments:
                         if isinstance(typ, custom_types.Path) and typ.exists:
                             assert val.exists(), ValueError(f"Argument '{argname}' requires an existing path, "
                                                             f"but '{argval}' does not exist")
-                    elif isinstance(typ, custom_types._Choices):
+                    elif is_choices(typ):
                         val = argval
                         assert val in typ.__values__, f"Invalid value '{val}' for argument '{arg}', " \
-                                                      f"available choices are: {typ.__values__}"
-                    elif issubclass(typ, Arguments.Enum):
+                            f"available choices are: {typ.__values__}"
+                    elif issubclass(Arguments.Enum, typ):
                         # experimental support for custom enum
                         try:
                             # noinspection PyCallingNonCallable
@@ -121,7 +248,9 @@ class Arguments:
             from IPython.core import ultratb
             sys.excepthook = ultratb.FormattedTB(mode='Context', color_scheme='Linux', call_pdb=1)
 
+        self.preprocess()
         self._validate()
+        self.postprocess()
 
     def _validate(self):
         rules = self.validate() or []
@@ -138,8 +267,14 @@ class Arguments:
                         if not result:
                             raise ValidationError(k, v, validator.__name__)
 
-    def validate(self):
+    def preprocess(self) -> None:
         """
+        Postprocessing of the arguments. This will be called before validation.
+        """
+        pass
+
+    def validate(self) -> List[Tuple[str, Validator]]:
+        r"""
         Return a list of validation rules. Each validation rule is a tuple of (pattern, validator), where:
 
         - ``pattern``: A regular expression string. The validation rule is applied to all arguments whose name is
@@ -160,19 +295,38 @@ class Arguments:
         """
         pass
 
-    @staticmethod
-    def _dispatch(v, func):
-        return lambda: v.value(func())
+    def postprocess(self) -> None:
+        """
+        Postprocessing of the arguments. This will be called after validation.
+        """
+        pass
+
+    # Credit: https://github.com/eaplatanios/symphony-mt/
+    def to_string(self, max_width=None) -> str:
+        k_col = "Arguments"
+        v_col = "Values"
+        valid_keys = [k for k in dir(self) if not (k.startswith('_') or k.lower() in self._reserved_keys)]
+        # valid_keys = list(self._get_arg_names())
+        valid_vals = [repr(getattr(self, k)) for k in valid_keys]
+        max_key = max(len(k_col), max(len(k) for k in valid_keys))
+        max_val = max(len(v_col), max(len(v) for v in valid_vals))
+        if max_width is not None:
+            max_val = min(max_val, max_width - max_key - 7)
+
+        def get_row(k: str, v: str) -> str:
+            if len(v) > max_val:
+                v = v[:((max_val - 5) // 2)] + ' ... ' + v[-((max_val - 4) // 2):]
+                assert len(v) == max_val
+            return f"║ {k.ljust(max_key)} │ {v.ljust(max_val)} ║\n"
+
+        s = repr(self.__class__) + '\n'
+        s += f"╔═{'═' * max_key}═╤═{'═' * max_val}═╗\n"
+        s += get_row(k_col, v_col)
+        s += f"╠═{'═' * max_key}═╪═{'═' * max_val}═╣\n"
+        for k, v in zip(valid_keys, valid_vals):
+            s += get_row(k, v)
+        s += f"╚═{'═' * max_key}═╧═{'═' * max_val}═╝\n"
+        return s
 
     def __str__(self):
-        s = repr(self.__class__) + '\n' + '-' * 75 + '\n'
-        max_key = max(len(k) for k in dir(self) if not k.startswith('_') and k not in self._reserved_keys)
-        for k in sorted(dir(self)):
-            if k.startswith('_') or k in self._reserved_keys:
-                continue
-            v = getattr(self, k)
-            if isinstance(type(v), types.MethodType):
-                continue
-            s += f"{k}{' ' * (2 + max_key - len(k))}{v!r}\n"
-        s += ('-' * 75)
-        return s
+        return self.to_string()
