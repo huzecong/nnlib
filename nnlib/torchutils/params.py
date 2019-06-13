@@ -1,18 +1,20 @@
 from typing import List, Tuple, Union
 
-from .. import utils
-from ..torch import *
+from torch.optim.optimizer import Optimizer
+
+from nnlib import utils
+from nnlib.torch import *
 
 __all__ = ['get_parameters', 'param_count', 'dtype_size', 'print_module_memory_consumption']
 
 
-def get_parameters(module: Union[nn.Module, torch.optim.Optimizer]) -> List[nn.Parameter]:
+def get_parameters(module: Union[nn.Module, Optimizer]) -> List[nn.Parameter]:
     if isinstance(module, nn.Module):
         # This is useful because certain parameters are replaced by wrappers
         return [p for p in module.parameters() if isinstance(p, nn.Parameter) and p.requires_grad]
-    elif isinstance(module, torch.optim.Optimizer):
+    elif isinstance(module, Optimizer):
         optim = module
-        return [param for param_group in optim.param_groups for param in param_group['params']]
+        return [param for param_group in optim.param_groups for param in param_group['params']]  # type: ignore
     else:
         raise TypeError(f"`get_parameters` accepts argument of type `nn.Module` or `torch.optim.Optimizer`, "
                         f"but received {type(module)}")
@@ -29,7 +31,7 @@ def dtype_size(dtype: torch.dtype) -> int:
         return 8
     if dtype in [torch.float16, torch.int16]:
         return 2
-    if dtype in [torch.int8, torch.uint8]:
+    if dtype in [torch.uint8]:
         return 1
     raise ValueError(f"Invalid dtype: {dtype:r}")
 

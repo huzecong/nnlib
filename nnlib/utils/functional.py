@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import Callable, Iterator, List, Sequence, TypeVar, overload, Iterable, Optional, Any
+from typing import Any, Callable, Iterable, Iterator, List, Optional, Sequence, TypeVar, overload
 
 __all__ = ['scanl', 'scanr', 'is_none', 'not_none', 'filter_none', 'split_according_to', 'split_by']
 
@@ -91,10 +91,10 @@ def filter_none(x: Iterable[Optional[A]]) -> Iterable[A]:
     r"""
     Filters not-\ ``None`` elements in list. Returns a generator.
     """
-    return filter(not_none, x)
+    return filter(not_none, x)  # type: ignore
 
 
-def split_according_to(criterion: Callable[[A], bool], _list: Sequence[A], empty_segments=False) \
+def split_according_to(criterion: Callable[[A], bool], _list: Sequence[A], empty_segments: bool = False) \
         -> Iterator[Sequence[A]]:
     r"""
     Find elements in list where ``criterion`` is satisfied, and split list into sub-lists by dropping those elements.
@@ -116,7 +116,7 @@ def split_according_to(criterion: Callable[[A], bool], _list: Sequence[A], empty
         yield _list[last:]
 
 
-def split_by(sep: A, _list: Sequence[A], empty_segments=False) -> Iterator[Sequence[A]]:
+def split_by(sep: A, _list: Sequence[A], empty_segments: bool = False) -> Iterator[Sequence[A]]:
     r"""
     Split list into sub-lists by dropping elements that matches ``sep``.
 

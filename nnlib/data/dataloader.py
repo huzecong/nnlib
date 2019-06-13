@@ -7,8 +7,9 @@ from typing import Any, Callable, Dict, Generic, Iterable, Iterator, List, Mappi
 
 import numpy as np
 
-from .. import utils
-from ..utils import Logging, path_add_suffix
+from nnlib import utils
+from nnlib.utils.filesystem import path_add_suffix
+from nnlib.utils.logging import Logging
 
 __all__ = ['Vocabulary', 'DataLoader', 'read_file', 'read_bitext_files']
 
@@ -50,7 +51,8 @@ class Vocabulary(defaultdict, Generic[K, V]):
             raise ValueError(f"Trying to modify a frozen vocabulary with key '{key}' and value '{value}'.")
         super().__setitem__(key, value)
 
-    def update(self, m: Union[K, Sequence[K]], **kwargs):
+    def update(self,  # type: ignore
+               m: Union[K, Sequence[K]], **kwargs):
         r""""""
         if isinstance(m, dict):
             super().update(m)
@@ -193,7 +195,7 @@ class DataLoader(Generic[Token]):
         exists = [self._vocab_path(name).exists() for name, vocab in self._vocabs.items() if vocab._load]
         return all(exists)
 
-    def _save_vocabulary(self):
+    def _save_vocabulary(self) -> None:
         self._vocab_path().mkdir(parents=True, exist_ok=True)
         if self.__version__ is not None:
             with self._vocab_path('__version__').open('w') as f:
@@ -215,7 +217,7 @@ class DataLoader(Generic[Token]):
         """
         raise NotImplementedError
 
-    def read_example(self, tag: Optional[str] = None, verbose=False) -> Iterable[Any]:
+    def read_example(self, tag: Optional[str] = None, verbose: bool = False) -> Iterable[Any]:
         r"""
         Iterate over examples. You should read the files according to ``self.file_path`` (or ``self.file_path[tag]``
         if ``tag`` is specified).
@@ -225,7 +227,7 @@ class DataLoader(Generic[Token]):
         """
         raise NotImplementedError
 
-    def generate_vocab(self):
+    def generate_vocab(self) -> None:
         r"""
         Called when loading dataset for the first time. You should generate vocabularies and add special tokens
         in this function.
@@ -245,7 +247,7 @@ class DataLoader(Generic[Token]):
         """
         pass
 
-    def preprocess(self):
+    def preprocess(self) -> None:
         r"""
         Called after vocabulary is loaded or generated. This is when you read and preprocess your data.
 
@@ -265,7 +267,7 @@ class DataLoader(Generic[Token]):
         """
         pass
 
-    def iterdata(self, tag: Optional[str] = None, *args, **kwargs) -> Iterable[List[Token]]:
+    def iterdata(self, tag: Optional[str] = None, *args, **kwargs) -> Iterator[List[Token]]:
         r"""
         Return an iterator allowing per-example iteration of data.
 
@@ -275,7 +277,7 @@ class DataLoader(Generic[Token]):
         raise NotImplementedError
 
     @classmethod
-    def _iterbatch_list(cls, data: List[List[Token]], size: int, shuffle=False, different_size=True) \
+    def _iterbatch_list(cls, data: List[List[Token]], size: int, shuffle: bool = False, different_size: bool = True) \
             -> Iterator[List[List[Token]]]:
         r"""
         List slice shuffling. Local order is preserved (useful for data presorted by sentence length).
@@ -309,7 +311,7 @@ class DataLoader(Generic[Token]):
             yield window[(i * size):((i + 1) * size)]
 
     @classmethod
-    def _iterbatch_iter(cls, data_iter: Iterable[List[Token]], size: int, different_size=False) \
+    def _iterbatch_iter(cls, data_iter: Iterable[List[Token]], size: int, different_size: bool = False) \
             -> Iterator[List[List[Token]]]:
         r"""
         Simple batching with no reordering.
@@ -350,7 +352,7 @@ class DataLoader(Generic[Token]):
                 fields[x].append(example[x])
         return tuple(fields)
 
-    def iterbatch(self, batch_size: int, tag: Optional[str] = None, shuffle=True, ordering='none',
+    def iterbatch(self, batch_size: int, tag: Optional[str] = None, shuffle: bool = True, ordering: str = 'none',
                   *args, **kwargs) -> Iterator[List[List[Token]]]:
         r"""
         Common batching interface for all datasets. Three batching strategies are implemented:
@@ -393,9 +395,11 @@ class DataLoader(Generic[Token]):
             else:
                 batch_iter = self._iterbatch_iter(data_iter, batch_size)
 
-        # noinspection PyTypeChecker
-        return utils.MeasurableGenerator(map(self._convert_batch_tuple, batch_iter),
-                                         utils.ceil_div(len(data_iter), batch_size))
+        generator = map(self._convert_batch_tuple, batch_iter)
+        try:
+            return utils.MeasurableGenerator(generator, utils.ceil_div(len(data_iter), batch_size))  # type: ignore
+        except (TypeError, NotImplementedError):
+            return generator
 
     @classmethod
     def sort_vocabulary(cls, word_vocab: Vocabulary[K, V], word_freq: Vocabulary[int, int]) \
@@ -429,8 +433,8 @@ class DataLoader(Generic[Token]):
 
     @classmethod
     def prune_vocabulary(cls, word_vocab: Vocabulary[str, V], word_freq: Vocabulary[int, int], unk_token: str,
-                         max_size: Optional[int] = None, min_freq: Optional[int] = None, verbose=False,
-                         meta_data: Vocabulary[str, int] = None, keep_words: Optional[List[str]] = None) \
+                         max_size: Optional[int] = None, min_freq: Optional[int] = None, verbose: bool = False,
+                         meta_data: Optional[Vocabulary[str, int]] = None, keep_words: Optional[List[str]] = None) \
             -> Tuple[Vocabulary[str, V], Vocabulary[int, int]]:
         r"""
         Prune vocabulary according to frequency.

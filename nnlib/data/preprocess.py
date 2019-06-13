@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import List, Optional
 
-from .. import utils
-from ..utils import PathType, path_add_suffix, path_lca
+from nnlib import utils
+from nnlib.utils.filesystem import PathType, path_add_suffix, path_lca
 
 __all__ = ['tokenize', 'moses_tokenize', 'spacy_tokenize', 'spm_tokenize', 'get_tokenization_args']
 

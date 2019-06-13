@@ -3,16 +3,18 @@ Miscellaneous Functions
 """
 import functools
 import io
-from typing import Iterable, TypeVar, overload
+from typing import Dict, Iterable, List, TypeVar, Union, overload
 
-from .logging import Logging
+import numpy as np
+
+from nnlib.utils.logging import Logging
 
 __all__ = ['progress', 'deprecated', 'map_to_list', 'memoization', 'reverse_map']
 
 T = TypeVar('T')
 
 
-@overload
+@overload  # type: ignore
 def progress(iterable: Iterable[T], verbose=True, **kwargs) -> Iterable[T]:
     ...
 
@@ -50,12 +52,7 @@ try:
     import tqdm
 
 
-    @overload
-    def progress(iterable=None, verbose=True, **kwargs) -> tqdm.tqdm:
-        ...
-
-
-    def progress(iterable=None, verbose=True, **kwargs):
+    def progress(iterable=None, verbose=True, **kwargs):  # type: ignore
         if not verbose:
             return _DummyTqdm(iterable)  # could be none
         # bar_format = '{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed} ~{remaining}]'
@@ -71,7 +68,7 @@ try:
 
 except ImportError:
     # noinspection PyUnusedLocal
-    def progress(iterable=None, verbose=True, **kwargs):
+    def progress(iterable=None, verbose=True, **kwargs):  # type: ignore
         if not verbose:
             return _DummyTqdm(iterable)
         Logging.warn("`tqdm` package is not installed, no progress bar is shown.", category=ImportWarning)
@@ -95,7 +92,7 @@ def deprecated(new_func=None):
     return decorator
 
 
-def map_to_list(d):
+def map_to_list(d: Dict[int, T]) -> List[T]:
     r"""
     Given a dict mapping indices (continuous indices starting from 0) to values, convert it into a list.
 
@@ -116,6 +113,14 @@ def memoization(f):
 
     wrapped._states = {}
     return wrapped
+
+
+@overload
+def reverse_map(d: Dict[T, int]) -> List[T]: ...
+
+
+@overload
+def reverse_map(d: Union[np.ndarray, List[int]]) -> List[int]: ...
 
 
 def reverse_map(d):

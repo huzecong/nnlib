@@ -1,15 +1,18 @@
-from typing import List, Sequence, Tuple, TypeVar, overload
+from typing import List, Sequence, Tuple, TypeVar, overload, Iterator
 
 import numpy as np
 
-from .iterable import MeasurableGenerator
-from .math import ceil_div
-from ..torch import *
+from nnlib.torch import *
+from nnlib.utils.iterable import MeasurableGenerator
+from nnlib.utils.math import ceil_div
 
 __all__ = ['minibatches_from', 'pad_sequences', 'batch_sequences', 'shift_packed_seq', 'mask_dropout_embeddings']
 
+T = TypeVar('T')
 
-def _minibatches_from(data, size=16, shuffle=True, different_size=False):
+
+def _minibatches_from(data: List[T], size: int = 16, shuffle: bool = True,
+                      different_size: bool = False) -> Iterator[List[T]]:
     length = len(data)
     if shuffle:
         idxs = np.random.permutation(ceil_div(length, size)) * size
@@ -23,7 +26,8 @@ def _minibatches_from(data, size=16, shuffle=True, different_size=False):
         yield batch
 
 
-def minibatches_from(data, size=16, shuffle=True, different_size=False):
+def minibatches_from(data: List[T], size: int = 16, shuffle: bool = True,
+                     different_size: bool = False) -> Iterator[List[T]]:
     r"""
     A low-level API to directly create mini-batches from a list.
 
@@ -39,10 +43,7 @@ def minibatches_from(data, size=16, shuffle=True, different_size=False):
     return MeasurableGenerator(generator, length)
 
 
-T = TypeVar('T')
-
-
-def pad_sequences(seqs: List[List[int]], batch_first=False, pad: int = -1) -> LongTensor:
+def pad_sequences(seqs: List[List[int]], batch_first: bool = False, pad: int = -1) -> LongTensor:
     r"""
     A wrapper around :func:`nn.utils.rnn.pad_sequence` that takes a list of lists, and converts it into a list of
     :class:`torch.LongTensor`\ s.
@@ -52,15 +53,15 @@ def pad_sequences(seqs: List[List[int]], batch_first=False, pad: int = -1) -> Lo
 
 
 @overload
-def batch_sequences(seqs: Sequence[Sequence[T]], ordered=False) -> PackedSequence: ...
+def batch_sequences(seqs: Sequence[Sequence[T]], ordered: bool) -> PackedSequence: ...
 
 
 @overload
-def batch_sequences(seqs: Sequence[Sequence[T]], *args: Sequence, ordered=False) \
+def batch_sequences(seqs: Sequence[Sequence[T]], extra_seq1: Sequence, *extra_seqs: Sequence, ordered: bool) \
         -> Tuple[PackedSequence, Tuple[Sequence, ...]]: ...
 
 
-def batch_sequences(seqs, *args, ordered=False):
+def batch_sequences(seqs, *extra_seqs, ordered=False):
     r"""
     Given a batch from data loader, convert it into PyTorch :class:`PackedSequence`.
 
@@ -69,7 +70,7 @@ def batch_sequences(seqs, *args, ordered=False):
     consistent reordering.
 
     :param seqs: The sequences.
-    :param args: Other data to be reordered.
+    :param extra_seqs: Other data to be reordered.
     :param ordered: If true, assume (and check) that the sequences are already sorted in decreasing length.
     :param pack: If true, return a PackedSequence, otherwise return a Tensor.
     """
@@ -77,7 +78,7 @@ def batch_sequences(seqs, *args, ordered=False):
     if ordered and indices != list(range(len(seqs))):
         raise ValueError("Sentences are not sorted in decreasing length while specifying `ordered=True`")
     tensor_seqs = [torch.tensor(seqs[idx], dtype=torch.long) for idx in indices]
-    reordered_args = tuple([xs[idx] for idx in indices] for xs in args)
+    reordered_args = tuple([xs[idx] for idx in indices] for xs in extra_seqs)
     packed_seq: PackedSequence = nn.utils.rnn.pack_padded_sequence(
         nn.utils.rnn.pad_sequence(tensor_seqs, padding_value=-1), [len(seq) for seq in tensor_seqs])
     if len(reordered_args) > 0:
@@ -94,11 +95,12 @@ def shift_packed_seq(seq: PackedSequence, start: int = 0) -> PackedSequence:
                   from the end).
     :return: Truncated sequence.
     """
-    data, batch_sizes = seq
+    data = seq.data
+    batch_sizes = seq.batch_sizes
     return PackedSequence(data[sum(batch_sizes[:start]):], batch_sizes[start:])
 
 
-def mask_dropout_embeddings(strs: Sequence[Sequence[T]], dropout_prob: float, transposed=False) -> np.ndarray:
+def mask_dropout_embeddings(strs: Sequence[Sequence[T]], dropout_prob: float, transposed: bool = False) -> np.ndarray:
     r"""
     Generate mask for embedding dropout, each word type is either dropped out as a whole
     or scaled according to the dropout probability.

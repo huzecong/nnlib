@@ -1,7 +1,7 @@
-from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple, Optional, TypeVar, Union, no_type_check
 
-from .. import utils
-from ..utils import Logging
+from nnlib import utils
+from nnlib.utils.logging import Logging
 
 __all__ = ['Trainer']
 
@@ -42,7 +42,8 @@ class Trainer(Generic[T]):
     LOG_MESSAGE = "Epoch {epoch}, Iter {iter}: {records}"
 
     def __init__(self, *, valid_iters: int = 5000, log_iters: int = 10, max_epochs: int = -1, max_iters: int = -1,
-                 decay_threshold: int = 3, patience: int = 5, metric_higher_better=True, timestamp=True) -> None:
+                 decay_threshold: int = 3, patience: int = 5, metric_higher_better: bool = True,
+                 timestamp: bool = True) -> None:
         self.epoch = 0
         self.iterations = 0
         self.valid_iters = valid_iters
@@ -107,11 +108,12 @@ class Trainer(Generic[T]):
     def decay(self) -> None:
         raise NotImplementedError
 
-    def _print_summary(self, period='log') -> None:
+    @no_type_check
+    def _print_summary(self, period: str = 'log') -> None:
         summary = []
         for record in self.records.values():
             if record.period == period:
-                value = record.record.value()  # type: ignore
+                value = record.record.value()
                 if record.post_compute is not None:
                     value = record.post_compute(value)
                 if isinstance(value, float):
@@ -120,7 +122,7 @@ class Trainer(Generic[T]):
                 record.record.clear()
         if len(summary) == 0:
             return
-        records = ', '.join(name + '=' + value for name, value in summary)
+        records = ', '.join(f'{name}={value}' for name, value in summary)
         log_message = self.LOG_MESSAGE.format(epoch=self.epoch, iter=self.iterations, records=records)
         Logging(1).log(log_message, timestamp=self.timestamp)
 

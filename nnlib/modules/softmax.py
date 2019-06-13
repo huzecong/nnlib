@@ -3,9 +3,9 @@ from typing import Optional, Sequence, Mapping, Union
 
 import numpy as np
 
-from .linear import Linear
-from .. import utils
-from ..torch import *
+from nnlib import utils
+from nnlib.modules.linear import Linear
+from nnlib.torch import *
 
 __all__ = ['Softmax', 'AdaptedSoftmax']
 
@@ -22,7 +22,8 @@ class Softmax(nn.Module):
         self.vocab_size = vocab_size
         self.linear = Linear(in_features=embed_dim, out_features=vocab_size, bias=bias, _weight=_weight)
 
-    def forward(self, input: Tensor, target: torch.LongTensor, reduction='elementwise_mean',
+    def forward(self,  # type: ignore
+                input: Tensor, target: torch.LongTensor, reduction='elementwise_mean',
                 ignore_index: Optional[int] = None, smoothing: float = 0.0) -> Tensor:
         r"""
         :param input: Input of shape ``batch_size * ... * embed_dim``.
@@ -51,8 +52,8 @@ class Softmax(nn.Module):
             # TODO: Add support for ignore_index
             smoothed_prob = smoothing / (self.vocab_size - 1)
             loss = -torch.sum(probs, dim=1) * smoothed_prob
-            loss -= torch.gather(probs, dim=1, index=target.contiguous().view(-1, 1)).view(-1) \
-                    * (1 - smoothing - smoothed_prob)
+            loss -= (torch.gather(probs, dim=1, index=target.contiguous().view(-1, 1)).view(-1) *
+                     (1 - smoothing - smoothed_prob))
             if reduction == 'elementwise_mean':
                 loss = torch.mean(loss)
             elif reduction == 'sum':
@@ -67,7 +68,7 @@ class Softmax(nn.Module):
         logits = self.linear.forward(input)
         return torch.log_softmax(logits, dim=1)
 
-    def predict(self, input: Tensor) -> torch.LongTensor:
+    def predict(self, input: Tensor) -> LongTensor:
         logits = self.linear(input)
         return torch.argmax(logits, dim=1)
 
@@ -77,6 +78,9 @@ class AdaptedSoftmax(nn.AdaptiveLogSoftmaxWithLoss):
     Wrapper over :py:class:`torch.nn.AdaptiveLogSoftmaxWithLoss`. Maintains a mapping of data indices to softmax
     indices based on frequency.
     """
+
+    indices: LongTensor
+    reverse_indices: LongTensor
 
     def __init__(self, vocab_size: int, embed_dim: int, vocab_freq: Union[Mapping[int, int], Sequence[int]],
                  cutoffs: Optional[Sequence[int]] = None, **kwargs):
@@ -88,8 +92,6 @@ class AdaptedSoftmax(nn.AdaptiveLogSoftmaxWithLoss):
         :param cutoffs: Manually specify cluster partitions, or ``None`` to use default partition scheme.
         :param kwargs: Remaining keyword arguments passed to :py:class:`torch.nn.AdaptiveLogSoftmaxWithLoss`
         """
-        self.indices = torch.tensor(sorted(range(vocab_size), key=lambda x: vocab_freq[x], reverse=True))
-        self.reverse_indices = torch.tensor(utils.reverse_map(self.indices), dtype=torch.long)
 
         if cutoffs is None:
             probs = np.asarray(vocab_freq)
@@ -100,7 +102,13 @@ class AdaptedSoftmax(nn.AdaptiveLogSoftmaxWithLoss):
 
         super().__init__(embed_dim, vocab_size, cutoffs=cutoffs, **kwargs)
 
-    def forward(self, input: Tensor, target: torch.LongTensor, reduction='elementwise_mean') -> Tensor:
+        indices = torch.tensor(sorted(range(vocab_size), key=lambda x: vocab_freq[x], reverse=True))
+        reverse_indices = torch.tensor(utils.reverse_map(self.indices), dtype=torch.long)
+        self.register_buffer('indices', indices)
+        self.register_buffer('reverse_indices', reverse_indices)
+
+    def forward(self,  # type: ignore
+                input: Tensor, target: torch.LongTensor, reduction: str = 'elementwise_mean') -> Tensor:
         log_likelihood, _loss = super().forward(input, self.indices[target])
         if reduction == 'elementwise_mean':
             loss = _loss
@@ -117,6 +125,6 @@ class AdaptedSoftmax(nn.AdaptiveLogSoftmaxWithLoss):
         mapped = torch.index_select(output, dim=1, index=self.reverse_indices)
         return mapped
 
-    def predict(self, input: Tensor) -> torch.LongTensor:
+    def predict(self, input: Tensor) -> LongTensor:
         output = super().predict(input)
         return self.reverse_indices[output]

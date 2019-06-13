@@ -35,12 +35,12 @@ class Logging:
 
     _global_files: List[TextIO] = []
 
-    def __init__(self, level=DEFAULT, file: TextIO = sys.stderr):
+    def __init__(self, level: int = DEFAULT, file: TextIO = sys.stderr):
         self._level = level
         self._file = file
 
     @classmethod
-    def tee(cls, file):
+    def tee(cls, file: TextIO):
         cls._global_files.append(file)
 
     @classmethod

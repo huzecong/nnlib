@@ -4,12 +4,12 @@ import inspect
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Tuple, Union, Type, no_type_check
 
+from nnlib.arguments import custom_types
 from nnlib.arguments.custom_types import NoneType, is_choices
+from nnlib.arguments.validator import ValidationError, Validator
 from nnlib.utils import Logging
-from . import custom_types
-from .validator import ValidationError, Validator
 
 
 class ArgumentError(Exception):
@@ -78,6 +78,7 @@ class Arguments:
         return False
 
     # TODO
+    @no_type_check
     @classmethod
     def _parse_type_spec(cls) -> Dict[str, _ArgTypeSpec]:
         """
@@ -132,7 +133,7 @@ class Arguments:
             if getattr(arg_typ, '__origin__', None) is Union and NoneType in arg_typ.__args__:
                 nullable = True
                 # extract the type wrapped inside `Optional`
-                arg_typ = next(t for t in arg_typ.__args__ if not isinstance(t, NoneType))  # type: ignore
+                arg_typ = next(t for t in arg_typ.__args__ if not isinstance(t, NoneType))
 
             arg_val = getattr(cls, arg_name, None)
             required = not hasattr(cls, arg_name) or (arg_val is None and not nullable)

@@ -1,7 +1,8 @@
 """
 Values and Counter Utilities
 """
-from typing import Dict, List
+import math
+from typing import Dict, List, Tuple, Callable, Optional, Union
 
 __all__ = ['AnnealedValue', 'LambdaValue', 'MilestoneCounter',
            'Average', 'MovingAverage', 'WeightedAverage', 'SimpleAverage', 'HarmonicMean',
@@ -25,13 +26,13 @@ class AnnealedValue:
     :param keyframes: List of `(iteration, value)` pairs.
     """
 
-    def __init__(self, keyframes):
+    def __init__(self, keyframes: List[Tuple[float, float]]):
         assert len(keyframes) > 0
         self.keyframes = list(sorted(keyframes))
         self.keyframes.insert(0, (0, self.keyframes[0][1]))
-        self.keyframes.append((float("inf"), self.keyframes[-1][1]))
+        self.keyframes.append((math.inf, self.keyframes[-1][1]))
 
-        self.slopes = []
+        self.slopes: List[float] = []
         for i in range(len(self.keyframes) - 1):
             this_frame = self.keyframes[i]
             next_frame = self.keyframes[i + 1]
@@ -46,7 +47,7 @@ class AnnealedValue:
         raise NotImplementedError("This is not how you should use this class. "
                                   "Did you call `bind_to` on `Arguments`?")
 
-    def value(self, iteration):
+    def value(self, iteration: int) -> float:
         r"""
         Return the value at a specific iteration.
 
@@ -63,15 +64,15 @@ class AnnealedValue:
         assert False
 
 
-class LambdaValue(object):
-    def __init__(self, func):
+class LambdaValue:
+    def __init__(self, func: Callable[[int], float]):
         self.func = func
 
     def __call__(self, *args, **kwargs):
         raise NotImplementedError("This is not how you should use this class. "
                                   "Did you call `bind_to` on `Arguments`?")
 
-    def value(self, iteration):
+    def value(self, iteration: int) -> float:
         r"""
         Return the value at a specific iteration.
 
@@ -80,21 +81,26 @@ class LambdaValue(object):
         return self.func(iteration)
 
 
-class MilestoneCounter(object):
+class MilestoneCounter:
     r"""
     Equally distribute milestones according to progress. Keep track of current progress.
     """
 
-    def __init__(self, total, *, scale=None, milestones=None):
+    def __init__(self, total: int, *, scale: Optional[float] = None, milestones: Optional[int] = None):
         self.total = total
-        self.scale = float(scale) * self.total if scale is not None else float(total) / milestones
+        if scale is not None:
+            self.scale = float(scale) * self.total
+        elif milestones is not None:
+            self.scale = float(total) / milestones
+        else:
+            raise ValueError("'scale' and 'milestones' cannot both be None")
         self.progress_ = 0
         self.last_milestone = 0
 
-    def progress(self, amount):
+    def progress(self, amount: int):
         self.progress_ += amount
 
-    def milestone(self):
+    def milestone(self) -> int:
         r"""
         :return: How many milestones have passed since last query.
         """
@@ -105,7 +111,7 @@ class MilestoneCounter(object):
         return count
 
 
-class Average(object):
+class Average:
     def add(self, value: float):
         raise NotImplementedError
 
@@ -209,17 +215,17 @@ class _ValueRecords:
     value_dict: Dict[str, Average] = {}
 
 
-def add_record(key, average_obj=None):
+def add_record(key: str, average_obj: Optional[Average] = None):
     if average_obj is None:
         average_obj = SimpleAverage()
     _ValueRecords.value_dict[key] = average_obj
 
 
-def record_value(key, value, *args, **kwargs):
-    _ValueRecords.value_dict[key].add(value, *args, **kwargs)
+def record_value(key: str, value: float, *args, **kwargs):
+    _ValueRecords.value_dict[key].add(value, *args, **kwargs)  # type: ignore
 
 
-def summarize_values(string=True):
+def summarize_values(string: bool = True) -> Union[str, Dict[str, float]]:
     values = {}
     for key, records in _ValueRecords.value_dict.items():
         values[key] = records.value()

@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import List
 from urllib.error import HTTPError
 
-from . import download
-from .dataset import NMTDataset
-from ...utils import PathType
+from nnlib.data.datasets import download
+from nnlib.data.datasets.dataset import NMTDataset
+from nnlib.utils.filesystem import PathType
 
 
 def _parse_ted_talks_dataset(directory: Path, dataset_path: Path):
@@ -48,7 +48,7 @@ class TEDTalks(NMTDataset):
 
     # noinspection PyMethodOverriding
     @classmethod
-    def load(cls, language: str, split: str = 'train', directory: PathType = 'data/', **kwargs) -> Path:
+    def load(cls, language: str, split: str = 'train', directory: PathType = 'data/', **kwargs) -> Path:  # type: ignore
         r"""
         :param language: Language abbreviation, see `TED website
             <https://www.ted.com/participate/translate/our-languages>`_ for language names.

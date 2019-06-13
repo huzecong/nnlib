@@ -1,8 +1,8 @@
 import math
-from typing import Callable, List, Optional, TypeVar, Union
+from typing import Callable, List, Optional, TypeVar, Union, Dict
 
-from ..torch import *
-from ..utils import Logging
+from nnlib.torch import *
+from nnlib.utils.logging import Logging
 
 __all__ = ['Linear', 'MLP', 'FC']
 
@@ -25,7 +25,7 @@ class Linear(nn.Linear):
         self.reset_parameters()
 
 
-Activation = Union[str, Callable[[Tensor], Tensor]]
+Activation = Callable[[Tensor], Tensor]
 T = TypeVar('T')
 MaybeList = Union[T, List[T]]
 
@@ -55,7 +55,7 @@ class MLP(nn.Module):
     :param dropout: If not ``None``, apply dropout **before** linear transform.
     """
 
-    activation_func = {
+    activation_func: Dict[str, Activation] = {
         'relu': torch.relu,
         'sigmoid': torch.sigmoid,
         'tanh': torch.tanh,
@@ -63,8 +63,10 @@ class MLP(nn.Module):
     }
     activation_func['id'].__name__ = 'linear'
 
+    activations: List[Activation]
+
     def __init__(self, num_layers: int, input_dim: int, output_dim: int, hidden_dims: Optional[List[int]] = None,
-                 activation: MaybeList[Activation] = 'id',
+                 activation: MaybeList[Union[str, Activation]] = 'id',
                  bias: MaybeList[bool] = True, bias_init: Optional[MaybeList[Optional[float]]] = None,
                  dropout: Optional[MaybeList[float]] = None):
         # validate num_layers
@@ -136,12 +138,12 @@ class MLP(nn.Module):
                 else:
                     nn.init.uniform_(linear.bias, -std, std)
 
-    def forward(self, xs: Tensor) -> Tensor:
+    def forward(self, xs: Tensor) -> Tensor:  # type: ignore
         r""""""
         for linear, activation, dropout in zip(self.layers, self.activations, self.dropouts):
             if dropout > 0.0:
                 xs = F.dropout(xs, dropout, self.training)
-            xs = activation(linear.forward(xs))
+            xs = activation(linear(xs))
         return xs
 
 
@@ -150,6 +152,6 @@ class FC:
     Fully-connected layer. A wrapper for 1-layer MLP.
     """
 
-    def __new__(cls, input_dim: int, output_dim: int, activation: Activation = 'id',
+    def __new__(cls, input_dim: int, output_dim: int, activation: Union[str, Activation] = 'id',
                 bias: bool = True, bias_init: Optional[float] = None, dropout: Optional[float] = None):
         return MLP(1, input_dim, output_dim, None, activation, bias, bias_init, dropout)

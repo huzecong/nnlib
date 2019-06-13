@@ -1,1 +1,1 @@
-from . import data, modules, torchutils, utils
+from nnlib import data, modules, torchutils, utils

@@ -2,7 +2,7 @@
 import typing
 from pathlib import Path
 
-from .validator import ValidationError
+from nnlib.arguments.validator import ValidationError
 
 __all__ = ['NoneType', 'Path', 'Choices', 'is_choices']
 
@@ -20,8 +20,7 @@ class ArgType:
 
 
 # noinspection PyUnresolvedReferences,PyProtectedMember
-@typing.no_type_check
-class _Choices(typing._FinalTypingBase, _root=True):
+class _Choices(typing._FinalTypingBase, _root=True):  # type: ignore
     # copied from typing._Union
     def __new__(cls, values=None, origin=None, *args, _root=False):
         self = super().__new__(cls, values, origin, *args, _root=_root)

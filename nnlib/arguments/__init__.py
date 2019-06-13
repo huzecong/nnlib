@@ -1,1 +1,1 @@
-from .arguments import Arguments
+from nnlib.arguments.arguments import Arguments

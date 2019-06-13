@@ -1,7 +1,7 @@
 import math
 import random
 from collections import defaultdict
-from typing import Dict, Iterator, List, Mapping, Sequence, Tuple, TypeVar
+from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, TypeVar
 
 __all__ = ['bucketed_bitext_iterator', 'sorted_bitext_iterator', 'bitext_index_iterator', 'bitext_iterator',
            'multi_dataset_iterator']
@@ -12,7 +12,7 @@ LangPair = Tuple[str, str]  # a pair of language specifiers
 
 
 def bucketed_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
-                             max_length: int = None) \
+                             max_length: Optional[int] = None) \
         -> Iterator[List[int]]:
     r"""
     Return an iterator generating batches over bi-text bucketed by length. Each batch only contains examples with
@@ -49,7 +49,7 @@ def bucketed_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[
 
 
 def sorted_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
-                           max_length: int = None, bins: Sequence[int] = None) \
+                           max_length: Optional[int] = None, bins: Optional[Sequence[int]] = None) \
         -> Iterator[List[int]]:
     r"""
     Return an iterator generating batches over bi-text. Examples in a batch are of similar length, and are sorted in
@@ -97,7 +97,7 @@ def sorted_bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Se
 
 
 def bitext_index_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
-                          max_length: int = None, sort: bool = False) \
+                          max_length: Optional[int] = None, sort: bool = False) \
         -> Iterator[List[int]]:
     r"""
     A convenient interface that calls other bi-text iterator functions. Returns an iterator over example indices.
@@ -117,7 +117,7 @@ def bitext_index_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sen
 
 
 def bitext_iterator(src_sents: Sequence[Sentence], tgt_sents: Sequence[Sentence], batch_size: int,
-                    max_length: int = None, sort: bool = False) \
+                    max_length: Optional[int] = None, sort: bool = False) \
         -> Iterator[Tuple[List[Sentence], List[Sentence]]]:
     r"""
     A wrapper over :func:`bitext_index_iterator` that returns the actual data examples instead of indices.

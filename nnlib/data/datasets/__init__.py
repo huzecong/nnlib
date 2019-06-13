@@ -8,5 +8,5 @@ one path per split to the data files.
 This might not be the best design for general NLP tasks, but is probably enough for NMT.
 """
 
-from .iwslt import IWSLT
-from .ted_talks import TEDTalks
+from nnlib.data.datasets.iwslt import IWSLT
+from nnlib.data.datasets.ted_talks import TEDTalks

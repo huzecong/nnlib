@@ -1,2 +1,2 @@
-from .cuda import *
-from .params import *
+from nnlib.torchutils.cuda import *
+from nnlib.torchutils.params import *

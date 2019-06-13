@@ -1,8 +1,11 @@
 import functools
 import time
 
-from ..torch import *
-from ..utils import Logging, memoization
+from torch.optim.optimizer import Optimizer
+
+from nnlib.torch import *
+from nnlib.utils.logging import Logging
+from nnlib.utils.misc import memoization
 
 __all__ = ['is_cuda', 'device', 'prevent_oom']
 
@@ -25,7 +28,7 @@ def device(module: nn.Module) -> torch.device:
     return next(module.parameters()).device
 
 
-def save_checkpoint(model: nn.Module, optim: torch.optim.Optimizer,
+def save_checkpoint(model: nn.Module, optim: Optimizer,
                     epoch=None, train_state=None, args=None, *, filename):
     states = {
         'model_state': model.state_dict(),

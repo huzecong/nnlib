@@ -1,7 +1,9 @@
+from typing import List
+
 __all__ = ['bieso2bio', 'bio2bieso']
 
 
-def bieso2bio(tags):
+def bieso2bio(tags: List[str]) -> List[str]:
     new_tags = []
     pos = -1
     for i, tag in enumerate(tags):
@@ -17,7 +19,7 @@ def bieso2bio(tags):
     return new_tags
 
 
-def bio2bieso(tags):
+def bio2bieso(tags: List[str]) -> List[str]:
     new_tags = []
     pos = -1
     for i, tag in enumerate(tags):

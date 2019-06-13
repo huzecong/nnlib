@@ -1,10 +1,10 @@
 from pathlib import Path
-from typing import List, Union, overload
+from typing import List, Union, overload, Callable
 
 import numpy as np
 
-from ..data.dataloader import Vocabulary
-from ..torch import *
+from nnlib.data.dataloader import Vocabulary
+from nnlib.torch import *
 
 __all__ = ['Embedding']
 
@@ -18,14 +18,16 @@ class Embedding(nn.Embedding):
     - Support embedding dropout.
     """
 
+    drop_emb: nn.Module
+
     def __init__(self, num_embeddings: int, embedding_dim: int, *, embedding_dropout: float = 0.0, **kwargs):
         super().__init__(num_embeddings, embedding_dim, **kwargs)
         if embedding_dropout > 0.0:
             self.drop_emb = nn.Dropout(embedding_dropout)  # TODO: Implement correct embedding dropout
         else:
-            self.drop_emb = lambda x: x  # identity
+            self.drop_emb = nn.Identity()  # identity
 
-    @overload
+    @overload  # type: ignore
     def forward(self, input: torch.LongTensor) -> Tensor:
         ...
 
@@ -76,7 +78,8 @@ class Embedding(nn.Embedding):
 
     # noinspection PyMethodOverriding
     @classmethod
-    def from_pretrained(cls, embed_type: str, embed_path: Path, word_vocab: Vocabulary, embed_dim: int,
+    def from_pretrained(cls,  # type: ignore
+                        embed_type: str, embed_path: Path, word_vocab: Vocabulary, embed_dim: int,
                         freeze=True, sparse=False) -> 'Embedding':
         r"""
         Creates an :class:`Embedding` instance from external pretrained embeddings.

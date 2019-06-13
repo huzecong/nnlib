@@ -1,5 +1,12 @@
 *.pyc
 
+# Cache
+.mypy_cache/
+
+# Local files
+venv/
+.idea/
+
 # Build files
 build/
 dist/

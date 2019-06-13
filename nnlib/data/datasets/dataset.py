@@ -2,7 +2,7 @@ import itertools
 from pathlib import Path
 from typing import List, Tuple, Union
 
-from ...utils import PathType
+from nnlib.utils.filesystem import PathType
 
 
 class NMTDataset:

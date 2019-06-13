@@ -1,4 +1,3 @@
-ipdb
 numpy>=1.14.5
 torch>=0.4.1
 tqdm>=4.25.0

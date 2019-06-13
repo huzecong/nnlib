@@ -5,7 +5,7 @@ import collections
 
 import numpy as np
 
-from .functional import not_none
+from nnlib.utils.functional import not_none
 
 __all__ = ['FNVHash', 'ceil_div', 'normalize', 'pow', 'prod', 'sum', 'random_subset', 'softmax']
 
@@ -125,7 +125,7 @@ def random_subset(total, size):
     :param size: Size of the randomly selected subset.
     :return: The 0-based indices of the subset elements.
     """
-    if type(size) is float:
+    if isinstance(size, float):
         size = int(total * size)
     # Don't trust `np.random.choice` without replacement! It's using brute force!
     if size * np.log(size) > total:

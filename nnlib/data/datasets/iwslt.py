@@ -5,9 +5,9 @@ from urllib.error import HTTPError
 
 import lxml.html
 
-from . import download
-from .dataset import NMTDataset
-from ...utils import PathType
+from nnlib.data.datasets import download
+from nnlib.data.datasets.dataset import NMTDataset
+from nnlib.utils.filesystem import PathType
 
 
 def _parse_iwslt_dataset(directory: Path):
@@ -45,9 +45,9 @@ class IWSLT(NMTDataset):
     Translation (IWSLT).
     """
 
+    # noinspection PyMethodOverriding
     @classmethod
-    def get_language_pairs(cls, *, version: int = None, **kwargs) -> List[Tuple[str, str]]:
-        assert version is not None, "Must specify IWSLT version"
+    def get_language_pairs(cls, *, version: int, **kwargs) -> List[Tuple[str, str]]:  # type: ignore
         if version == 2012:
             langs = ['ar', 'de', 'nl', 'pl', 'pt-br', 'ro', 'ru', 'sk', 'sl', 'tr', 'zh']
             lang_pairs = [('en', 'fr')] + [(lang, 'en') for lang in langs]
@@ -75,7 +75,7 @@ class IWSLT(NMTDataset):
 
     # noinspection PyMethodOverriding
     @classmethod
-    def load(cls, version: int, source: str, target: str, *,
+    def load(cls, version: int, source: str, target: str, *,  # type: ignore
              split: str = 'train', ver_tag: Optional[str] = None, directory: PathType = 'data/') \
             -> Tuple[Path, Path]:
         r"""

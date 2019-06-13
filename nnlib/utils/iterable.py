@@ -1,15 +1,16 @@
 """
 List, Iterator, and Lazy Evaluation Utilities
 """
-from abc import ABC
-from typing import Generator, Callable, TypeVar
+from typing import Any, Callable, Generic, Iterable, Iterator, List, Optional, Sequence, TypeVar
 
 import numpy as np
 
 __all__ = ['flat_iter', 'LazyList', 'ListWrapper', 'MeasurableGenerator', 'Range']
 
+T = TypeVar('T')
 
-def flat_iter(lst, expand_str=False):
+
+def flat_iter(lst: Sequence[Any], expand_str: bool = False) -> Iterator[Any]:
     r"""
     Recursively flatten list elements. For example::
 
@@ -37,7 +38,7 @@ def flat_iter(lst, expand_str=False):
                 yield x
 
 
-class LazyList:
+class LazyList(Generic[T]):
     r"""
     Lazy conversion from iterator to list. Useful when you want to support indexing into a computationally-expensive
     iterator (e.g. disk I/O). For example::
@@ -51,8 +52,8 @@ class LazyList:
     :param suffix: A fixed suffix to append to the list. When supplied, negative indexing is supported.
     """
 
-    class Iterator:
-        def __init__(self, list_):
+    class _Iterator:
+        def __init__(self, list_: 'LazyList'):
             self.pos = 0
             self.list = list_
 
@@ -67,16 +68,16 @@ class LazyList:
             else:
                 raise StopIteration
 
-    def __init__(self, iter_, suffix=None):
+    def __init__(self, iter_: Iterable[T], suffix: Optional[List[T]] = None):
         self.iter = iter(iter_)
-        self.list = []
+        self.list: List[T] = []
         self.suffix = suffix
         self.length = -1
 
-    def __iter__(self):
-        return LazyList.Iterator(self)
+    def __iter__(self) -> '_Iterator':
+        return self._Iterator(self)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int) -> T:
         if isinstance(item, int):
             if item < 0:
                 if self.suffix is None:
@@ -87,7 +88,8 @@ class LazyList:
                     self.list.append(next(self.iter))
             except StopIteration:
                 self.length = len(self.list)
-                self.list.extend(self.suffix)
+                if self.suffix is not None:
+                    self.list.extend(self.suffix)
             return self.list[item]
         else:  # if isinstance(item, slice):
             raise NotImplementedError
@@ -131,6 +133,7 @@ class ListWrapper:
     We can't just name the methods as they would be and then delete some of them, because method dispatching
     happens at the class level: unless overridden by instances, the class method will always be called.
     """
+
     def __iter__(self):
         return ListWrapper(iter(self.content), self.func)
 
@@ -176,6 +179,7 @@ class MeasurableGenerator:
     :param gen: The generator.
     :param length: The length of the generator.
     """
+
     def __init__(self, gen, length):
         self.gen = gen
         self.length = length

@@ -1,2 +1,2 @@
-from . import hooks
-from .trainer import *
+from nnlib.train import hooks
+from nnlib.train.trainer import *
